@@ -2,7 +2,7 @@ package compiler;
 
 /**
  *
- * @author gabriel
+ * @author Gabriel Peres de Andrade 726517
  */
 public class Compiler {
 
