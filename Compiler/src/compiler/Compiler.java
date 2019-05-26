@@ -6,12 +6,16 @@ package compiler;
  */
 public class Compiler {
 
-    public Program compile(char[] input, PrintWriter outError) {
-        symbolTable = new Hashtable<String, Variable>();
-        error = new CompilerError(outError);
-        lexer = new Lexer(input, error);
-        error.setLexer(lexer);
-        lexer.nextToken();
-        return program();
-    }
+    public Program compile( char []input, PrintWriter outError ) 
+    {
+
+		symbolTable = new Hashtable<String, Variable>();
+		error = new CompilerError( outError );
+		lexer = new Lexer(input, error);
+		error.setLexer(lexer);
+		lexer.nextToken();
+		
+		return program();
+	}
+
 }

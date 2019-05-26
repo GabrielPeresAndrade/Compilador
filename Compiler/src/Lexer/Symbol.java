@@ -6,7 +6,7 @@ package Lexer;
  */
 public enum Symbol {
     
-    FUNC("function"),
+    FUNCTION("function"),
     ABREPAR("("),
     FECHAPAR(")"),
     ARROW("->"),
