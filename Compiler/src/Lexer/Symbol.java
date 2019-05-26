@@ -38,7 +38,10 @@ public enum Symbol {
     MULT("*"),
     DIV("/"),
     TRUE("true"),
-    FALSE("false");
+    FALSE("false"),
+    EOF("eof"),
+    CHARACTER("character"),
+    NUMBER("Number");
     
     Symbol(String name) 
     {

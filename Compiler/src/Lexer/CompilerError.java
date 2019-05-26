@@ -1,4 +1,7 @@
-import Lexer.*; import java.io.*;
+package Lexer;
+
+
+import java.io.*;
 
 public class CompilerError {
 
@@ -6,10 +9,9 @@ public class CompilerError {
 	private PrintWriter out;
 	private boolean thereWasAnError;
 
-	public CompilerError( Lexer lexer, PrintWriter out ) 
+	public CompilerError( PrintWriter out ) 
 	{
 		// output of an error is done in out
-		this.lexer = lexer;
 		this.out = out;
 		thereWasAnError = false;
 	}

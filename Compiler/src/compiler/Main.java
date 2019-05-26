@@ -14,7 +14,6 @@ public class Main
         File file;
         FileReader stream;
         int numChRead;
-        Program program;
         if ( args.length != 2 ) 
         {
             System.out.println("Usage:\n Main input output");
@@ -76,11 +75,10 @@ public class Main
                 throw new RuntimeException();
             }
             PrintWriter printWriter = new PrintWriter(outputStream);
-            program = null;
     // the generated code goes to a file and so are the errors
             try 
             {
-                compiler.compile(input, printWriter );
+                compiler.compile(input, printWriter);
             } 
             catch ( RuntimeException e ) 
             {
