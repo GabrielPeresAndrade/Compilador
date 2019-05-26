@@ -4,13 +4,15 @@ package Lexer;
  *
   * @author Gabriel Peres de Andrade 726517
  */
+import java.util.*;
+
 public class Lexer {
 	// contains the keywords
 	static private Hashtable<String, Symbol> keywordsTable;
 	static 
-	{
-		keywordsTable = new Hashtable<String, Symbol>();
-		keywordsTable.put( "var", Symbol.VAR );
+        {
+		keywordsTable = new Hashtable();
+                keywordsTable.put( "var", Symbol.VAR );
 		keywordsTable.put( "if", Symbol.IF );
 		keywordsTable.put( "else", Symbol.ELSE );
 		keywordsTable.put( "Int", Symbol.INTEGER );
@@ -43,7 +45,7 @@ public class Lexer {
 	public Lexer( char []input, CompilerError error ) {
 		this.input = input;
 		// add an end-of-file label to make it easy to do the lexer
-		input[input.length - 1] = ’\0’;
+		input[input.length - 1] = '\0';
 		// number of the current line
 		lineNumber = 1;
 		tokenPos = 0;
@@ -57,20 +59,20 @@ public class Lexer {
 
 		char ch;
 
-		while ( (ch = input[tokenPos]) == ’ ’ || ch == ’\r’ || ch == ’\t’ || ch == ’\n’) 
+		while ( (ch = input[tokenPos]) == ' ' || ch == '\r' || ch == '\t' || ch == '\n') 
 		{
 			// count the number of lines
-			if ( ch == ’\n’)
+			if ( ch == '\n')
 				lineNumber++;
 			tokenPos++;
 		}
-		if ( ch == ’\0’)
+		if ( ch == '\0')
 			token = Symbol.EOF;
 		else
-			if ( input[tokenPos] == ’/’ && input[tokenPos + 1] == ’/’ ) {
+			if ( input[tokenPos] == '/' && input[tokenPos + 1] == '/' ) {
 				// comment found
-				while ( input[tokenPos] != ’\0’&& input[tokenPos] != ’\n’ )
-					tokenPos++;
+				while ( input[tokenPos] != '\0'&& input[tokenPos] != '\n' )
+                                    tokenPos++;
 				nextToken();
 			}
 		else 
@@ -115,89 +117,86 @@ public class Lexer {
 					tokenPos++;
 					switch ( ch ) 
 					{
-						case ’+’ :
+						case '+' :
 							token = Symbol.PLUS;
 						break;
-						case ’-’ :
+						case '-' :
 							token = Symbol.MINUS;
 						break;
-						case ’*’ :
+						case '*' :
 							token = Symbol.MULT;
 						break;
-						case ’/’ :
+						case '/' :
 							token = Symbol.DIV;
 						break;
-						case ’%’ :
-							token = Symbol.REMAINDER;
-						break;
-						case ’<’ :
-							if ( input[tokenPos] == ’=’ ) {
+						case '<' :
+							if ( input[tokenPos] == '=' ) {
 								tokenPos++;
 								token = Symbol.LE;
 							}
 							else 
-								if ( input[tokenPos] == ’>’ ) {
+								if ( input[tokenPos] == '>' ) {
 									tokenPos++;
 									token = Symbol.NEQ;
 								}
-						else
-							token = Symbol.LT;
+                                                                else
+                                                                    token = Symbol.LT;
 						break;
-						case ’>’ :
-							if ( input[tokenPos] == ’=’ ) {
+						case '>' :
+							if ( input[tokenPos] == '=' ) {
 								tokenPos++;
 								token = Symbol.GE;
 							}
 							else
 								token = Symbol.GT;
 						break;
-						case ’=’ :
-							if ( input[tokenPos] == ’=’ ) {
+						case '=' :
+							if ( input[tokenPos] == '=' ) {
 								tokenPos++;
 								token = Symbol.EQ;
 							}
-						else
-							token = Symbol.ASSIGN;
+                                                        else
+                                                            token = Symbol.ASSIGN;
 						break;
-						case ’(’ :
+						case '(' :
 							token = Symbol.LEFTPAR;
 						break;
-						case ’)’ :
+						case ')' :
 							token = Symbol.RIGHTPAR;
 						break;
-						case ’,’ :
+						case ',' :
 							token = Symbol.COMMA;
 						break;
-						case ’;’ :
+						case ';' :
 							token = Symbol.SEMICOLON;
 						break;
-						case ’:’ :
-							token = Symbol.COLON;
+						case ':' :
+							token = Symbol.DOISPONTOS;
 						break;
-						case ’\’’ :
+						case '\'' :
 							token = Symbol.CHARACTER;
 							charValue = input[tokenPos];
 							tokenPos++;
-							if ( input[tokenPos] != ’\’’ )
+							if ( input[tokenPos] != '\'' )
 								error.signal("Illegal literal character" + input[tokenPos-1] );
 							tokenPos++;
 						break;
 						// the next four symbols are not used by the language
 						// but are returned to help the error treatment
-						case ’{’ :
+						case '{' :
 							token = Symbol.CURLYLEFTBRACE;
 						break;
-						case ’}’ :
+						case '}' :
 							token = Symbol.CURLYRIGHTBRACE;
 						break;
-						case ’[’ :
+						case '[' :
 							token = Symbol.LEFTSQBRACKET;
 						break;
-						case ’]’ :
+						case ']' :
 							token = Symbol.RIGHTSQBRACKET;
 						break;
 						default :
-							error.signal("Invalid Character: ’" + ch + "’");
+							error.signal("Invalid Character: '" + ch + "'");
 					}
 				}
 			}

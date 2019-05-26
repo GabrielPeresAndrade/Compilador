@@ -80,21 +80,11 @@ public class Main
     // the generated code goes to a file and so are the errors
             try 
             {
-                program = compiler.compile(input, printWriter );
+                compiler.compile(input, printWriter );
             } 
             catch ( RuntimeException e ) 
             {
                 System.out.println(e);
-            }
-            if ( program != null ) 
-            {
-                PW pw = new PW();
-                pw.set(printWriter);
-                program.genC(pw);
-                if ( printWriter.checkError() ) 
-                {
-                    System.out.println("There was an error in the output");
-                }
             }
         }
     }
