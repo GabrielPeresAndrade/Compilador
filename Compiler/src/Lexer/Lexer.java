@@ -122,7 +122,16 @@ public class Lexer {
                             token = Symbol.PLUS;
                         break;
                         case '-' :
-                            token = Symbol.MINUS;
+                            switch (input[tokenPos]) 
+                            {
+                                case '>':
+                                    tokenPos++;
+                                    token = Symbol.ARROW;
+                                break;
+                                default:
+                                    token = Symbol.MINUS;
+                                break;
+                            }
                         break;
                         case '*' :
                             token = Symbol.MULT;
@@ -136,10 +145,6 @@ public class Lexer {
                                 case '=':
                                     tokenPos++;
                                     token = Symbol.LE;
-                                break;
-                                case '>':
-                                    tokenPos++;
-                                    token = Symbol.NEQ;
                                 break;
                                 default:
                                     token = Symbol.LT;
@@ -161,6 +166,14 @@ public class Lexer {
                             }
                             else
                                 token = Symbol.ASSIGN;
+                        break;
+                        case '!' :
+                            if ( input[tokenPos] == '=' ) {
+                                tokenPos++;
+                                token = Symbol.NEQ;
+                            }
+                            else
+                                System.out.println("AAA tem um '!' do nada");
                         break;
                         case '(' :
                             token = Symbol.ABREPAR;

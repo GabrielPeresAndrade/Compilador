@@ -79,7 +79,7 @@ public class Compiler {
                         }
                         
                         //Verfica se abriu chaves
-                        StatList();
+                        //StatList();
                         
                     }
                     // Trata o erro "Esperava ")" e não encontrou"
