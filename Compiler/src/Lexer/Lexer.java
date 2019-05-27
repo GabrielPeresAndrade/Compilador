@@ -2,136 +2,137 @@ package Lexer;
 
 /**
  *
-  * @author Gabriel Peres de Andrade 726517
+ * @author Angelo Bezerra de Souza 726496
+ * @author Gabriel Peres de Andrade 726517
+ * @author Igor Inácio de Carvalho Silva 725804
  */
 import java.util.*;
 
 public class Lexer {
-	// contains the keywords
-	static private Hashtable<String, Symbol> keywordsTable;
-	static 
-    {
-            
-		keywordsTable = new Hashtable();
+    // contains the keywords
+    static private Hashtable<String, Symbol> keywordsTable;
+    static 
+    {       
+        keywordsTable = new Hashtable();
         keywordsTable.put( "var", Symbol.VAR );
-		keywordsTable.put( "if", Symbol.IF );
-		keywordsTable.put( "else", Symbol.ELSE );
-		keywordsTable.put( "Int", Symbol.INTEGER );
-		keywordsTable.put( "Boolean", Symbol.BOOLEAN );
-		keywordsTable.put( "String", Symbol.STRING );
-		keywordsTable.put( "true", Symbol.TRUE );
-		keywordsTable.put( "false", Symbol.FALSE );
-		keywordsTable.put( "and", Symbol.AND );
-		keywordsTable.put( "or", Symbol.OR );
-		keywordsTable.put( "function", Symbol.FUNCTION );
-		keywordsTable.put( "while", Symbol.WHILE );
-		keywordsTable.put( "return", Symbol.RETURN );
-	}
-	public Symbol token;
-	
-	private String stringValue;
-	private int numberValue;
-	private char charValue;
-	private int tokenPos;
-	// input[lastTokenPos] is the last character of the last token found
-	private int lastTokenPos;
-	// input[beforeLastTokenPos] is the last character of the token before the last token found
-	private int beforeLastTokenPos;
-	// program given as input - source code
-	private char []input;
-	private int lineNumber;
-	private CompilerError error;
-	private static final int MaxValueInteger = 2147483647;
+        keywordsTable.put( "if", Symbol.IF );
+        keywordsTable.put( "else", Symbol.ELSE );
+        keywordsTable.put( "Int", Symbol.INTEGER );
+        keywordsTable.put( "Boolean", Symbol.BOOLEAN );
+        keywordsTable.put( "String", Symbol.STRING );
+        keywordsTable.put( "true", Symbol.TRUE );
+        keywordsTable.put( "false", Symbol.FALSE );
+        keywordsTable.put( "and", Symbol.AND );
+        keywordsTable.put( "or", Symbol.OR );
+        keywordsTable.put( "function", Symbol.FUNCTION );
+        keywordsTable.put( "while", Symbol.WHILE );
+        keywordsTable.put( "return", Symbol.RETURN );
+    }
+    
+    public Symbol token;
+    private String stringValue;
+    private int numberValue;
+    private char charValue;
+    private int tokenPos;
+    private int lastTokenPos;
+    private int beforeLastTokenPos;
+    private char []input;
+    private int lineNumber;
+    private CompilerError error;
+    private static final int MaxValueInteger = 2147483647;
 
-	public Lexer( char []input, CompilerError error ) {
-		this.input = input;
-		// add an end-of-file label to make it easy to do the lexer
-		input[input.length - 1] = '\0';
-		// number of the current line
-		lineNumber = 1;
-		tokenPos = 0;
-		lastTokenPos = 0;
-		beforeLastTokenPos = 0;
+    public Lexer( char []input, CompilerError error ) 
+    {
+            this.input = input;
+            // add an end-of-file label to make it easy to do the lexer
+            input[input.length - 1] = '\0';
+            // number of the current line
+            lineNumber = 1;
+            tokenPos = 0;
+            lastTokenPos = 0;
+            beforeLastTokenPos = 0;
 
-		this.error = error;
-	} 
+            this.error = error;
+    } 
 
- 	public void nextToken() {
+    public void nextToken() 
+    {
 
-		char ch;
+        char ch;
 
-		while ( (ch = input[tokenPos]) == ' ' || ch == '\r' || ch == '\t' || ch == '\n') 
-		{
-			// count the number of lines
-			if ( ch == '\n')
-				lineNumber++;
-			tokenPos++;
-		}
-		if ( ch == '\0')
-			token = Symbol.EOF;
-		else
-			if ( input[tokenPos] == '/' && input[tokenPos + 1] == '/' ) {
-				// comment found
-				while ( input[tokenPos] != '\0'&& input[tokenPos] != '\n' )
-                                    tokenPos++;
-				nextToken();
-			}
-		else 
-		{
-			if ( Character.isLetter( ch ) ) {
-                                // get an identifier or keyword
-				StringBuffer ident = new StringBuffer();
-				while ( Character.isLetter( input[tokenPos] ) || Character.isDigit( input[tokenPos] ) ) {
-					ident.append(input[tokenPos]);
-					tokenPos++;
-				}
-				stringValue = ident.toString();
-				// if identStr is in the list of keywords, it is a keyword !
-				Symbol value = keywordsTable.get(stringValue);
-				if ( value == null )
-					token = Symbol.IDENT;
-				else
-					token = value;
-			}
-			else 
-			{
-				if ( Character.isDigit( ch ) ) 
-				{
-					// get a number
-					StringBuffer number = new StringBuffer();
-					while ( Character.isDigit( input[tokenPos] ) ) 
-					{
-						number.append(input[tokenPos]);
-						tokenPos++;
-					}
-					token = Symbol.NUMBER;
-					try {
-						numberValue = Integer.valueOf(number.toString()).intValue();
-					} catch ( NumberFormatException e ) {
-						error.signal("Number out of limits");
-					}
-					if ( numberValue >= MaxValueInteger )
-						error.signal("Number out of limits");
-				}
-				else 
-				{
-					tokenPos++;
-					switch ( ch ) 
-					{
-						case '+' :
-							token = Symbol.PLUS;
-						break;
-						case '-' :
-							token = Symbol.MINUS;
-						break;
-						case '*' :
-							token = Symbol.MULT;
-						break;
-						case '/' :
-							token = Symbol.DIV;
-						break;
-						case '<' :
-                            switch (input[tokenPos]) {
+        while ( (ch = input[tokenPos]) == ' ' || ch == '\r' || ch == '\t' || ch == '\n') 
+        {
+            // count the number of lines
+            if ( ch == '\n')
+                lineNumber++;
+            tokenPos++;
+        }
+        if ( ch == '\0')
+            token = Symbol.EOF;
+        else
+            if ( input[tokenPos] == '/' && input[tokenPos + 1] == '/' ) {
+                // comment found
+                while ( input[tokenPos] != '\0'&& input[tokenPos] != '\n' )
+                    tokenPos++;
+                nextToken();
+            }
+        else 
+        {
+            if ( Character.isLetter( ch ) ) {
+                // get an identifier or keyword
+                StringBuffer ident = new StringBuffer();
+                while ( Character.isLetter( input[tokenPos] ) || Character.isDigit( input[tokenPos] ) ) {
+                    ident.append(input[tokenPos]);
+                    tokenPos++;
+                }
+                stringValue = ident.toString();
+                // if identStr is in the list of keywords, it is a keyword !
+                Symbol value = keywordsTable.get(stringValue);
+                if ( value == null )
+                    token = Symbol.IDENT;
+                else
+                    token = value;
+            }
+            else 
+            {
+                if ( Character.isDigit( ch ) ) 
+                {
+                    // get a number
+                    StringBuffer number = new StringBuffer();
+                    while ( Character.isDigit( input[tokenPos] ) ) 
+                    {
+                        number.append(input[tokenPos]);
+                        tokenPos++;
+                    }
+                    token = Symbol.NUMBER;
+                    try {
+                        numberValue = Integer.valueOf(number.toString()).intValue();
+                    } catch ( NumberFormatException e ) {
+                        error.signal("Number out of limits");
+                    }
+                    if ( numberValue >= MaxValueInteger )
+                        error.signal("Number out of limits");
+                }
+                else 
+                {
+                    tokenPos++;
+                    switch ( ch ) 
+                    {
+                        case '+' :
+                            token = Symbol.PLUS;
+                        break;
+                        case '-' :
+                            token = Symbol.MINUS;
+                        break;
+                        case '*' :
+                            token = Symbol.MULT;
+                        break;
+                        case '/' :
+                            token = Symbol.DIV;
+                        break;
+                        case '<' :
+                            switch (input[tokenPos]) 
+                            {
                                 case '=':
                                     tokenPos++;
                                     token = Symbol.LE;
@@ -144,63 +145,64 @@ public class Lexer {
                                     token = Symbol.LT;
                                 break;
                             }
-						break;
-						case '>' :
-							if ( input[tokenPos] == '=' ) {
-								tokenPos++;
-								token = Symbol.GE;
-							}
-							else
-								token = Symbol.GT;
-						break;
-						case '=' :
-							if ( input[tokenPos] == '=' ) {
-								tokenPos++;
-								token = Symbol.EQ;
-							}
+                        break;
+                        case '>' :
+                            if ( input[tokenPos] == '=' ) {
+                                tokenPos++;
+                                token = Symbol.GE;
+                            }
+                            else
+                                token = Symbol.GT;
+                        break;
+                        case '=' :
+                            if ( input[tokenPos] == '=' ) {
+                                tokenPos++;
+                                token = Symbol.EQ;
+                            }
                             else
                                 token = Symbol.ASSIGN;
-						break;
-						case '(' :
-							token = Symbol.ABREPAR;
-						break;
-						case ')' :
-							token = Symbol.FECHAPAR;
-						break;
-						case ',' :
-							token = Symbol.VIRGULA;
-						break;
-						case ';' :
-							token = Symbol.PONTOVIRGULA;
-						break;
-						case ':' :
-							token = Symbol.DOISPONTOS;
-						break;
-						case '\'' :
-							token = Symbol.CHARACTER;
-							charValue = input[tokenPos];
-							tokenPos++;
-							if ( input[tokenPos] != '\'' )
-								error.signal("Illegal literal character" + input[tokenPos-1] );
-							tokenPos++;
-						break;
-						// the next four symbols are not used by the language
-						// but are returned to help the error treatment
-						case '{' :
-							token = Symbol.ABRECHAVE;
-						break;
-						case '}' :
-							token = Symbol.FECHACHAVE;
-						break;
-						default :
-							error.signal("Invalid Character: '" + ch + "'");
-					}
-				}
-			}
-		}
-		beforeLastTokenPos = lastTokenPos;
-		lastTokenPos = tokenPos - 1;
-	}
+                        break;
+                        case '(' :
+                            token = Symbol.ABREPAR;
+                        break;
+                        case ')' :
+                            token = Symbol.FECHAPAR;
+                        break;
+                        case ',' :
+                            token = Symbol.VIRGULA;
+                        break;
+                        case ';' :
+                            token = Symbol.PONTOVIRGULA;
+                        break;
+                        case ':' :
+                            token = Symbol.DOISPONTOS;
+                        break;
+                        case '\'' :
+                            token = Symbol.CHARACTER;
+                            charValue = input[tokenPos];
+                            tokenPos++;
+                            if ( input[tokenPos] != '\'' )
+                                error.signal("Illegal literal character" + input[tokenPos-1] );
+                            tokenPos++;
+                        break;
+                        // the next four symbols are not used by the language
+                        // but are returned to help the error treatment
+                        case '{' :
+                            token = Symbol.ABRECHAVE;
+                        break;
+                        case '}' :
+                            token = Symbol.FECHACHAVE;
+                        break;
+                        default :
+                            error.signal("Invalid Character: '" + ch + "'");
+                    }
+                }
+            }
+        }
+        beforeLastTokenPos = lastTokenPos;
+        lastTokenPos = tokenPos - 1;
+    }
+    
     public void skipBraces() 
     {
         // skip any of the symbols { } ( )
@@ -218,6 +220,7 @@ public class Lexer {
         if ( token == Symbol.EOF )
             error.signal("Unexpected EOF");
     }
+    
     public void skipTo( Symbol []arraySymbol ) 
     {
         // skip till one of the characters of arraySymbol appears in the input
@@ -241,6 +244,7 @@ public class Lexer {
         if ( token == Symbol.PONTOVIRGULA )
             nextToken();
     }
+    
     public int getLineNumber() 
     {
         return lineNumber;
