@@ -79,7 +79,7 @@ public class Compiler {
                         }
                         
                         //Verfica se abriu chaves
-                        //StatList();
+                        statList();
                         
                     }
                     // Trata o erro "Esperava ")" e não encontrou"
@@ -124,7 +124,19 @@ public class Compiler {
     
     //ParamDec ::= Id ":" Type
     private Param paramDec () {
-        
+        //Precisamos definir como será a classe parâmetro. Por enquanto retornarei NULL
+ 
+        if (lexer.token.equals(Symbol.IDENT)){
+            lexer.nextToken();
+            if (lexer.token.equals(Symbol.DOISPONTOS)) {
+                type();
+            }
+            else
+                error.signal("Erro: Esperava um ':'");     
+        }
+        else
+            error.signal("Erro: Esperava um identificador");
+        return null;
     }
     
     //Type ::= "Int" | "Boolean" | "String"
@@ -154,39 +166,89 @@ public class Compiler {
         ArrayList<Stat> statList = new ArrayList();
         
         if (lexer.token == Symbol.ABRECHAVE) {
+            lexer.nextToken();
             statList.add(stat());
         }
         //Trata o erro se não abrir chaves
         else {
             error.signal("Erro: '{' esperado");
         }
+        return null;
     }
+    //Stat ::= AssignExprStat | ReturnStat | VarDecStat | IfStat | WhileStat
     
-    private Stat stat () {
-        Stat result;
-        
-        switch ( lexer.token ) {
-            case RETURN :
-                result = Stat.returnStatType;
-            break;
-            case IF :
-                result = Stat.ifStatType;
-            break;
-            case WHILE :
-                result = Stat.whileStatType;
-            break;
-            case ASSIGN :
-                result = Stat.assignExprStatType;
-            break;
-            case VAR :
-                result = Stat.varDecStatType;
-            break; 
-            default :
-                error.signal("Erro: Tipo Inválido");
-                result =  Stat.ifStatType;
+    private Stat stat(){
+        //Verifica se é um if
+        //IfStat ::= "if" Expr StatList [ "else" StatList ]
+        if (lexer.token.equals(Symbol.IF)){
+            lexer.nextToken();
+            //chama o expr
+            expr();
+            lexer.nextToken();
+            //chama o statlist
+            statList();
+            lexer.nextToken();
+            //else é opcional, portanto não deve conter tratativa de erro
+            if (lexer.equals(Symbol.ELSE)){
+                lexer.nextToken();
+                statList();
             }
-        lexer.nextToken();
-        return result;  
+        }
+        //Verifica se é um while
+        //WhileStat ::= "while" Expr StatList
+        else if(lexer.token.equals(Symbol.WHILE)){
+            lexer.nextToken();
+            //chama o expr
+            expr();
+            lexer.nextToken();
+            //chama o statList
+            statList();
+        }
+        //verifica se é um varDecStat
+        //VarDecStat ::= "var" Id ":" Type ";"
+        //verifica se é um 'var'
+        else if(lexer.token.equals(Symbol.VAR)){
+            lexer.nextToken();
+            //verifica se é um id
+            if (lexer.token.equals(Symbol.IDENT)){
+                lexer.nextToken();
+                //verifica se é um ':'
+                if (lexer.token.equals(Symbol.DOISPONTOS)){
+                    lexer.nextToken();
+                    //chama o type
+                    type();
+                    lexer.nextToken();
+                    //verifica se é diferente de um ';'
+                    if (!lexer.token.equals(Symbol.PONTOVIRGULA))
+                        error.signal("Erro: Esperava ';'");
+                }
+                else
+                    error.signal("Erro: Esperava ':'");
+            }
+            else
+                error.signal("Error: Esperava um identificador");
+        }
+        //verifica se é um return
+        //ReturnStat ::= "return" Expr ";"
+        else if(lexer.token.equals(Symbol.RETURN)){
+            lexer.nextToken();
+            //chama o expr
+            expr();
+            lexer.nextToken();
+            //verifica se não é um ';'
+            if(!lexer.token.equals(Symbol.PONTOVIRGULA)){
+                error.signal("Erro: Esperava ';'");
+            }
+        }
+        
+        //verifica se é um assignExprStat
+        //AssignExprStat ::= Expr [ "=" Expr ] ";"
+        //TODO
+        
+        //tratamento de erro 
+        else
+            error.signal("Erro: declaração incorreta");
+        //trocar o retorno
+        return null;
     }
-    
 }
