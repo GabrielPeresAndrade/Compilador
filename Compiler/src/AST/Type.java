@@ -1,9 +1,10 @@
-
 package AST;
 
 /**
  *
- * @author gabriel
+ * @author Angelo Bezerra de Souza 726496
+ * @author Gabriel Peres de Andrade  726517
+ * @author Igor Inácio de Carvalho Silva 725804
  */
 abstract public class Type {
     public Type( String name ) {
@@ -18,5 +19,4 @@ abstract public class Type {
         return name;
     }
     private String name;
-
 }

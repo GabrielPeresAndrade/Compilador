@@ -2,7 +2,9 @@ package compiler;
 
 /**
  *
+ * @author Angelo Bezerra de Souza 726496
  * @author Gabriel Peres de Andrade 726517
+ * @author Igor Inácio de Carvalho Silva 725804
  */
 import AST.*;
 import java.io.*;
@@ -37,8 +39,8 @@ public class Main
                 System.out.println("Something wrong: file does not exist anymore");
                 throw new RuntimeException();
             }
-    // one more character for ’\0’ at the end that will be added by the
-    // compiler
+            // one more character for ’\0’ at the end that will be added by the
+            // compiler
             char []input = new char[ (int ) file.length() + 1 ];
             try 
             {
@@ -75,10 +77,10 @@ public class Main
                 throw new RuntimeException();
             }
             PrintWriter printWriter = new PrintWriter(outputStream);
-    // the generated code goes to a file and so are the errors
+            // the generated code goes to a file and so are the errors
             try 
             {
-                compiler.compile(input, printWriter);
+                Program program = compiler.compile(input, printWriter);
             } 
             catch ( RuntimeException e ) 
             {

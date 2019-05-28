@@ -2,10 +2,12 @@ package Lexer;
 
 /**
  *
+ * @author Angelo Bezerra de Souza 726496
  * @author Gabriel Peres de Andrade 726517
+ * @author Igor Inácio de Carvalho Silva 725804
+
  */
 public enum Symbol {
-    
     FUNCTION("function"),
     IDENT("Ident"),
     ABREPAR("("),
@@ -47,10 +49,12 @@ public enum Symbol {
     {
         this.name = name;
     }
+    
     public String toString()
     {
         return name;
     }
+    
     private String name;
 }
 
