@@ -7,8 +7,6 @@ package compiler;
  * @author Igor Inácio de Carvalho Silva 725804
  */
 
-import AST.Param;
-import AST.Func;
 import AST.*;
 import java.util.*;
 import java.lang.Character;
@@ -127,9 +125,12 @@ public class Compiler {
         //Precisamos definir como será a classe parâmetro. Por enquanto retornarei NULL
  
         if (lexer.token.equals(Symbol.IDENT)){
+            String name = lexer.getStringValue();
             lexer.nextToken();
             if (lexer.token.equals(Symbol.DOISPONTOS)) {
-                type();
+                lexer.nextToken();
+                Variable v = new Variable(name,type());
+                symbolTable.putInLocal(name,v);
             }
             else
                 error.signal("Erro: Esperava um ':'");     
@@ -183,7 +184,7 @@ public class Compiler {
         if (lexer.token.equals(Symbol.IF)){
             lexer.nextToken();
             //chama o expr
-            expr();
+            orExpr();
             lexer.nextToken();
             //chama o statlist
             statList();
@@ -199,7 +200,7 @@ public class Compiler {
         else if(lexer.token.equals(Symbol.WHILE)){
             lexer.nextToken();
             //chama o expr
-            expr();
+            orExpr();
             lexer.nextToken();
             //chama o statList
             statList();
@@ -233,7 +234,7 @@ public class Compiler {
         else if(lexer.token.equals(Symbol.RETURN)){
             lexer.nextToken();
             //chama o expr
-            expr();
+            orExpr();
             lexer.nextToken();
             //verifica se não é um ';'
             if(!lexer.token.equals(Symbol.PONTOVIRGULA)){
@@ -250,5 +251,139 @@ public class Compiler {
             error.signal("Erro: declaração incorreta");
         //trocar o retorno
         return null;
+    }
+    private boolean checkBooleanExpr( Type left, Type right ) 
+    {
+        if ( left == Type.undefinedType || right == Type.undefinedType )
+        return true;
+        else
+        return left == Type.booleanType && right == Type.booleanType;
+    }
+    
+    private Expr orExpr()
+    {
+        //  Expr ::= ExprAnd {"or" ExprAnd}
+        Expr left, right ;
+        left = andExpr();
+        while (lexer.token == Symbol.OR)
+        {
+            lexer.nextToken();
+            right = andExpr();
+            left = new CompositeExpr(left, Symbol.OR, right);
+        }
+        return left;
+    }
+
+    private Expr andExpr()
+    {
+        //  ExprAnd ::= ExprRel {"and" ExprRel}
+        Expr left, right ;
+        left = relExpr();
+        while (lexer.token == Symbol.AND)
+        {
+            lexer.nextToken();
+            right = relExpr();
+            left = new CompositeExpr(left, Symbol.AND, right);
+        }
+        return left;
+    }
+    private Expr relExpr()
+    {
+        //  ExprRel ::= ExprAdd [ RelOp ExprAdd ]
+        Expr left, right ;
+        left = addExpr();
+        if ((lexer.token == Symbol.LT)||
+            (lexer.token == Symbol.LE)||
+            (lexer.token == Symbol.GT)||
+            (lexer.token == Symbol.GE)||
+            (lexer.token == Symbol.EQ)||
+            (lexer.token == Symbol.NEQ))             
+        {
+            lexer.nextToken();
+            right = addExpr();
+            left = new CompositeExpr(left, Symbol.AND, right);
+        }
+        return left;
+    }
+    private Expr addExpr()
+    {
+        // ExprAdd ::= ExprMult {(" + " | " - ")ExprMult}
+        Symbol op;
+        Expr left, right;
+        left = multExpr();
+        while ( (op = lexer.token) == Symbol.PLUS || op == Symbol.MINUS ) {
+            lexer.nextToken();
+            right = multExpr();
+            left = new CompositeExpr( left, op, right );
+        }
+        return left;
+    }
+    
+    private Expr multExpr()
+    {
+        // ExprMult ::= ExprUnary {("*" | "/")ExprUnary}
+        Symbol op;
+        Expr left, right;
+        left = unaryExpr();
+        while ( (op = lexer.token) == Symbol.MULT || op == Symbol.DIV ) {
+            lexer.nextToken();
+            right = unaryExpr();
+            left = new CompositeExpr( left, op, right );
+        }
+        return left;
+    }
+    
+    private Expr unaryExpr()
+    {
+        // ExprUnary ::= [ ( "+" | "-" ) ] ExprPrimary
+        if ((lexer.token == Symbol.PLUS)||(lexer.token == Symbol.MINUS))
+            lexer.nextToken();
+        //DUVIDA A RESPEITO DO TIPO DO RETORNO
+        return primExpr();    
+    }
+    
+    private Expr primExpr() //PAREI NESSA FUNÇÃO FALTA PENSAR NOS RETORNOS E EXPRLITERAL
+    {
+        // ExprPrimary ::= Id | FuncCall | ExprLiteral
+        if (lexer.token == Symbol.IDENT){
+            //ID
+            String name = lexer.getStringValue();
+            lexer.nextToken();
+            if(lexer.token == Symbol.FECHAPAR )
+            {
+                //FUNCCALL
+                lexer.nextToken();
+                if( lexer.token != Symbol.FECHAPAR)
+                {
+                    orExpr();
+                    lexer.nextToken();
+                    while(lexer.token==Symbol.VIRGULA)
+                    {
+                        orExpr();
+                        lexer.nextToken();
+                    }
+                    if(lexer.token != Symbol.FECHAPAR)
+                        error.signal("Esperava um ')'");
+                    lexer.nextToken();
+                }   
+                
+            }
+            else
+            {
+                Variable v = (Variable)symbolTable.get(name);
+                if (v == null)
+                    error.signal("Variavel NÃO criada");
+                return new VariableExpr(v);
+            }
+        }
+        else
+        {
+           //ExprLiteral
+            return exprLiteral();
+        }
+    }
+    private Expr exprLiteral()
+    {
+        
     }
 }

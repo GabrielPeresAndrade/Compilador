@@ -3,10 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/xampp/htdocs/Compilador/Compiler/src/AST/Param.java</file>
-            <file>file:/C:/xampp/htdocs/Compilador/Compiler/src/compiler/Compiler.java</file>
-            <file>file:/C:/xampp/htdocs/Compilador/Compiler/src/AST/Stat.java</file>
-            <file>file:/C:/xampp/htdocs/Compilador/Compiler/src/Lexer/Symbol.java</file>
+            <file>file:/C:/Users/v-gamer/Documents/GitHub/Compilador/Compiler/src/AST/SymbolTable.java</file>
+            <file>file:/C:/Users/v-gamer/Documents/GitHub/Compilador/Compiler/src/AST/VariableExpr.java</file>
+            <file>file:/C:/Users/v-gamer/Documents/GitHub/Compilador/Compiler/src/AST/Program.java</file>
+            <file>file:/C:/Users/v-gamer/Documents/GitHub/Compilador/Compiler/src/AST/Variable.java</file>
+            <file>file:/C:/Users/v-gamer/Documents/GitHub/Compilador/Compiler/src/Lexer/Symbol.java</file>
+            <file>file:/C:/Users/v-gamer/Documents/GitHub/Compilador/Compiler/src/Lexer/Lexer.java</file>
+            <file>file:/C:/Users/v-gamer/Documents/GitHub/Compilador/Compiler/src/compiler/Compiler.java</file>
         </group>
     </open-files>
 </project-private>
