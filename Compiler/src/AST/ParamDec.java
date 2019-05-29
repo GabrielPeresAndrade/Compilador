@@ -8,18 +8,12 @@ import java.util.*;
  * @author Igor Inácio de Carvalho Silva 725804
 
  */
-public class Func {
-    //Atributos
+public class ParamDec {
     private String id;
-    private ParamList paramList;
     private Type type;
-    private StatList statList;
     
-    //Construtor
-    public Func (String id, ParamList paramList, Type type, StatList statList) {
+    public ParamDec (String id, Type type) {
         this.id = id;
-        this.paramList = paramList;
         this.type = type;
-        this.statList = statList;
     }
 }

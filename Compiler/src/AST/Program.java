@@ -1,10 +1,19 @@
 package AST;
-import java.util.*; import java.io.*;
+import java.util.*;
 
+/**
+ *
+ * @author Angelo Bezerra de Souza 726496
+ * @author Gabriel Peres de Andrade 726517
+ * @author Igor Inácio de Carvalho Silva 725804
+
+ */
 public class Program {
-    public Program( ArrayList<Func> procFunc ) {
-        this.procFunc = procFunc;
-    }
+    //Atributos
+    private ArrayList<Func> arrayFunc = new ArrayList<Func>();
     
-    private ArrayList<Func> procFunc;
+    //Construtor
+    public Program (ArrayList<Func> arrayFunc) {
+        this.arrayFunc = arrayFunc;
+    }
 }
