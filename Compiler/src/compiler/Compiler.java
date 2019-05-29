@@ -9,7 +9,6 @@ package compiler;
 
 import AST.*;
 import java.util.*;
-import java.lang.Character;
 import Lexer.*; 
 import java.io.*;
 
@@ -22,90 +21,104 @@ public class Compiler {
     public void compile( char []input, PrintWriter outError ) 
     {
 
+        //Instacia classes
         symbolTable = new SymbolTable();
         error = new CompilerError( outError );
         lexer = new Lexer(input, error);
         error.setLexer(lexer);
-        
+
+        //Inicia a leitura dos tokens
         lexer.nextToken();
         
+        //Inicia as chamadas da AST
         Program program = program();
     }
+    
     //Program ::= Func {Func}
     private Program program() {
+        //Mostra a chamada desse nó (Temporário)
+        System.out.println("Program");
+        
+        //Inicio da função
         ArrayList<Func> arrayFunc = new ArrayList();
         
-        while (lexer.token == Symbol.FUNCTION )
+        //Adiciona 0 ou mais funções ao vetor de funções
+        while (lexer.token == Symbol.EOF) {
             arrayFunc.add(func());
-            
-        if (arrayFunc.isEmpty()) {
-            System.out.println("Erro: nenhuma função");
+            lexer.nextToken();
         }
-        Program program = new Program(arrayFunc);
-        return program;
+        
+            
+        //Se não houver nenhuma função, sinaliza o erro
+        if (arrayFunc.isEmpty()) {
+            error.signal("Erro: Nenhuma função encontrada");
+        }
+        return new Program(arrayFunc);
     }
-    //Func ::= "function" Id [ "(" ParamList ")" ] ["->" Type ] StatList
-    //ParamList ::= ParamDec {”, ”ParamDec}
-    //ParamDec ::= Id ":" Type
     
+    //Func ::= "function" Id [ "(" ParamList ")" ] ["->" Type ] StatList
     private Func func () {
+        //Mostra a chamada desse nó (Temporário)
+        System.out.println("Func");
+        
+        //Declaração de variáveis
+        String id = "";
+        ParamList paramList = null;
+        Type type = null;
+        StatList statList = null;
+        
+        // Verifica se há o "function" obrigatório
         if (lexer.token == Symbol.FUNCTION) {
             lexer.nextToken();
-            //verificar se é um terminal Id
+            //verificar se há um ID (Nome da função)
             if (lexer.token == Symbol.IDENT) {
+                //Salva o nome da fução para enviar ao construtor de func
+                id = "";//lexer.token
                 lexer.nextToken();
-                //verificar se é um '('
+                
+                //Verifica se há parâmetros
                 if (lexer.token == Symbol.ABREPAR) {
-                    //Cria o array de parâmetros
-                    ArrayList<Param> arrayParam = paramList();
+                    lexer.nextToken();
+                    // Recebe lista de parâmetros
+                    paramList = paramList();
                     
-                    //Verifica se há ao menos um parmâetro
-                    if (arrayParam.isEmpty()) {
-                        error.signal("Erro: Nenhum parâmetro encontrado");
+                    //Se o parenteses não foi fechado, mostra o erro
+                    if (lexer.token != Symbol.FECHAPAR) {
+                        error.signal("Erro: Esperando ')'");
                     }
-                    
-                    //Verifica de fechou o parenteses
-                    if (lexer.token == Symbol.FECHAPAR) {
-                        lexer.nextToken();
-                        
-                        //Verfica se tem a seta de definição de tipo
-                        if (lexer.token == Symbol.ARROW) {
-                            lexer.nextToken();
-                    
-                            //Verifica se o tipo é valido
-                            type();
-                        }
-                        
-                        //Verfica se abriu chaves
-                        statList();
-                        
-                    }
-                    // Trata o erro "Esperava ")" e não encontrou"
+                    //Se o parênteses foi fechado, chama o nextToken
                     else {
-                        
+                        lexer.nextToken();
                     }
                 }
-                //Trata o erro "Esperava "(" e não econtrou"
-                else {
-                    
+                
+                //Verifica se há declaração de tipo
+                if (lexer.token == Symbol.ARROW) {
+                    lexer.nextToken();
+                    type = type();
                 }
+                
+                //Recebe o statList
+                statList = StatList();    
             }
-            //trata erro "Esperava um identifcador(nome da função) e não econtrou"
+            //Se não foi encontrado o nome da função
             else {
-            
+                error.signal("Erro Esperando um 'Identificador'");
             }
         }
-        //Exibe o erro "Esperava "function" e não encontrou"
+        //Se não houver o "function" obrigatório
         else {
-            
+            error.signal("Erro: Esperando 'function'");
         }
-        return null;
+        
+        //Se todas as verificações foram validadas
+        return new Func(id, paramList, type, statList);
     }
     
     //ParamList ::= ParamDec {”, ”P aramDec}
-    private ArrayList<Param> paramList () {
+    private ParamList paramList () {
         //Declara o vetor de parametros
-        ArrayList<Param> arrayParam = new ArrayList();
+        ArrayList<ParamDec> arrayParam = new ArrayList();
         
         //Adiciona o parâmetro
         arrayParam.add(paramDec());
@@ -117,15 +130,15 @@ public class Compiler {
         }
         
         //Retorna o array de parâmetros
-        return arrayParam;
+        return null;
     }
     
     //ParamDec ::= Id ":" Type
-    private Param paramDec () {
+    private ParamDec paramDec () {
         //Precisamos definir como será a classe parâmetro. Por enquanto retornarei NULL
- 
+        String name = "";
         if (lexer.token.equals(Symbol.IDENT)){
-            String name = lexer.getStringValue();
+            name = lexer.getStringValue();
             lexer.nextToken();
             if (lexer.token.equals(Symbol.DOISPONTOS)) {
                 lexer.nextToken();
@@ -137,7 +150,7 @@ public class Compiler {
         }
         else
             error.signal("Erro: Esperava um identificador");
-        return null;
+        return new ParamDec(name, type());
     }
     
     //Type ::= "Int" | "Boolean" | "String"
@@ -164,100 +177,89 @@ public class Compiler {
     
     //StatList ::= "{” {Stat} ”}"
     private ArrayList<Stat> statList() {
-        ArrayList<Stat> statList = new ArrayList();
+        ArrayList<Stat> statList = null;
         
         if (lexer.token == Symbol.ABRECHAVE) {
             lexer.nextToken();
-            statList.add(stat());
+            statList = stat();
         }
         //Trata o erro se não abrir chaves
         else {
             error.signal("Erro: '{' esperado");
         }
-        return null;
+        return statList;
     }
     //Stat ::= AssignExprStat | ReturnStat | VarDecStat | IfStat | WhileStat
     
-    private Stat stat(){
+    private ArrayList<Stat> stat(){
         //Verifica se é um if
         //IfStat ::= "if" Expr StatList [ "else" StatList ]
-        if (lexer.token.equals(Symbol.IF)){
-            lexer.nextToken();
-            //chama o expr
-            orExpr();
-            lexer.nextToken();
-            //chama o statlist
-            statList();
-            lexer.nextToken();
-            //else é opcional, portanto não deve conter tratativa de erro
-            if (lexer.equals(Symbol.ELSE)){
+        ArrayList <Stat> stat=null;
+        switch (lexer.token) {
+            case IF:
                 lexer.nextToken();
-                statList();
-            }
-        }
-        //Verifica se é um while
-        //WhileStat ::= "while" Expr StatList
-        else if(lexer.token.equals(Symbol.WHILE)){
-            lexer.nextToken();
-            //chama o expr
-            orExpr();
-            lexer.nextToken();
-            //chama o statList
-            statList();
-        }
-        //verifica se é um varDecStat
-        //VarDecStat ::= "var" Id ":" Type ";"
-        //verifica se é um 'var'
-        else if(lexer.token.equals(Symbol.VAR)){
-            lexer.nextToken();
-            //verifica se é um id
-            if (lexer.token.equals(Symbol.IDENT)){
+                //chama o expr
+                orExpr();
                 lexer.nextToken();
-                //verifica se é um ':'
-                if (lexer.token.equals(Symbol.DOISPONTOS)){
+                //chama o statlist
+               stat = statList();
+                //else é opcional, portanto não deve conter tratativa de erro
+                if (lexer.token.equals(Symbol.ELSE)){
                     lexer.nextToken();
-                    //chama o type
-                    type();
+                    statList();
+                }
+                break;
+            case WHILE:
+                lexer.nextToken();
+                //chama o expr
+                orExpr();
+                lexer.nextToken();
+                //chama o statList
+                stat = statList();
+                break;
+            case VAR:
+                lexer.nextToken();
+                //verifica se é um id
+                if (lexer.token.equals(Symbol.IDENT)){
                     lexer.nextToken();
-                    //verifica se é diferente de um ';'
-                    if (!lexer.token.equals(Symbol.PONTOVIRGULA))
-                        error.signal("Erro: Esperava ';'");
+                    //verifica se é um ':'
+                    if (lexer.token.equals(Symbol.DOISPONTOS)){
+                        lexer.nextToken();
+                        //chama o type
+                        Type t = type();
+                        lexer.nextToken();
+                        //verifica se é diferente de um ';'
+                        if (!lexer.token.equals(Symbol.PONTOVIRGULA))
+                            error.signal("Erro: Esperava ';'");
+                    }
+                    else
+                        error.signal("Erro: Esperava ':'");
                 }
                 else
-                    error.signal("Erro: Esperava ':'");
-            }
-            else
-                error.signal("Error: Esperava um identificador");
+                    error.signal("Error: Esperava um identificador");
+                break;
+            case RETURN:
+                lexer.nextToken();
+                //chama o expr
+                orExpr();
+                lexer.nextToken();
+                //verifica se não é um ';'
+                if(!lexer.token.equals(Symbol.PONTOVIRGULA)){
+                    error.signal("Erro: Esperava ';'");
+                }   break;
+            default:
+                error.signal("Erro: declaração incorreta");
+                break;
         }
-        //verifica se é um return
-        //ReturnStat ::= "return" Expr ";"
-        else if(lexer.token.equals(Symbol.RETURN)){
-            lexer.nextToken();
-            //chama o expr
-            orExpr();
-            lexer.nextToken();
-            //verifica se não é um ';'
-            if(!lexer.token.equals(Symbol.PONTOVIRGULA)){
-                error.signal("Erro: Esperava ';'");
-            }
-        }
-        
-        //verifica se é um assignExprStat
-        //AssignExprStat ::= Expr [ "=" Expr ] ";"
-        //TODO
-        
-        //tratamento de erro 
-        else
-            error.signal("Erro: declaração incorreta");
         //trocar o retorno
-        return null;
+        return stat;
     }
     private boolean checkBooleanExpr( Type left, Type right ) 
     {
         if ( left == Type.undefinedType || right == Type.undefinedType )
-        return true;
+            return true;
         else
-        return left == Type.booleanType && right == Type.booleanType;
+            return left == Type.booleanType && right == Type.booleanType;
     }
     
     private Expr orExpr()
@@ -349,7 +351,7 @@ public class Compiler {
             //ID
             String name = lexer.getStringValue();
             lexer.nextToken();
-            if(lexer.token == Symbol.FECHAPAR )
+            if(lexer.token == Symbol.ABREPAR )
             {
                 //FUNCCALL
                 lexer.nextToken();
@@ -365,8 +367,12 @@ public class Compiler {
                     if(lexer.token != Symbol.FECHAPAR)
                         error.signal("Esperava um ')'");
                     lexer.nextToken();
-                }   
-                
+                }
+                else
+                {
+                    lexer.nextToken();
+                }
+                //return ;
             }
             else
             {
@@ -381,9 +387,10 @@ public class Compiler {
            //ExprLiteral
             return exprLiteral();
         }
+        return new Expr();
     }
     private Expr exprLiteral()
     {
-        
+        return new Expr();
     }
 }
