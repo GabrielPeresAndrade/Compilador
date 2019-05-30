@@ -8,14 +8,16 @@ import java.util.*;
  * @author Igor Inácio de Carvalho Silva 725804
 
  */
-public class ParamDec {
+public class ExprPrimary {
     //Atributos
     private String id;
-    private Type type;
-    
+    private FuncCall funcCall;
+    private ExprLiteral exprLiteral;
+     
     //Construtor
-    public ParamDec (String id, Type type) {
+    public ExprPrimary(String id, FuncCall funcCall, ExprLiteral exprLiteral) {
         this.id = id;
-        this.type = type;
+        this.funcCall = funcCall;
+        this.exprLiteral = exprLiteral;
     }
 }

@@ -8,14 +8,14 @@ import java.util.*;
  * @author Igor Inácio de Carvalho Silva 725804
 
  */
-public class Expr {
+public class ExprAnd {
     //Atributos
-    private ExprAnd exprAnd;
-    private ExprAnd exprAnd2;
+    private ExprRel exprRel;
+    private ExprRel exprRel2;
     
     //Construtor
-    public Expr (ExprAnd exprAnd, ExprAnd exprAnd2) {
-        this.exprAnd = exprAnd;
-        this.exprAnd2 = exprAnd2;
+    public ExprAnd (ExprRel exprRel, ExprRel exprRel2) {
+        this.exprRel = exprRel;
+        this.exprRel2 = exprRel2;
     }     
 }

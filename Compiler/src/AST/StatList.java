@@ -9,8 +9,10 @@ import java.util.*;
 
  */
 public class StatList {
+    //Atriubots
     private ArrayList<Stat> statArray = new ArrayList();
     
+    //Cosntrutor
     public StatList (ArrayList<Stat> statArray) {
         this.statArray = statArray;
     }

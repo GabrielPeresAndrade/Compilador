@@ -9,9 +9,11 @@ import java.util.*;
 
  */
 public class WhileStat {
+    //Atributos
    private Expr expr;
    private StatList statList;
    
+   //Construtor
    public WhileStat (Expr expr, StatList statList) {
        this.expr = expr;
        this.statList = statList;

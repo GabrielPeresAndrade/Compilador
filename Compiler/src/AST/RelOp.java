@@ -8,14 +8,12 @@ import java.util.*;
  * @author Igor Inácio de Carvalho Silva 725804
 
  */
-public class ParamDec {
+public class RelOp {
     //Atributos
-    private String id;
-    private Type type;
+    private String op;
     
-    //Construtor
-    public ParamDec (String id, Type type) {
-        this.id = id;
-        this.type = type;
+    //Consturtor
+    public RelOp (String op) {
+        this.op = op;
     }
 }

@@ -9,8 +9,10 @@ import java.util.*;
 
  */
 public class ReturnStat {
+    //Atriubtos
     private Expr expr;
     
+    //Consturtor
     public ReturnStat (Expr expr) {
         this.expr = expr;
     }

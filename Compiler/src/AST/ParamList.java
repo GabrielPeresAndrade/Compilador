@@ -9,8 +9,10 @@ import java.util.*;
 
  */
 public class ParamList {
+   //Atriubtos
    private ArrayList<ParamDec> arrayParamDec = new ArrayList<ParamDec>();
    
+   //Construtor
    public ParamList (ArrayList<ParamDec> arrayParamDec) {
        this.arrayParamDec = arrayParamDec;
    }

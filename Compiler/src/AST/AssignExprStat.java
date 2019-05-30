@@ -9,9 +9,11 @@ import java.util.*;
 
  */
 public class AssignExprStat {
+    //Atributos
     private Expr expr;
     private Expr expr2;
     
+    //Construtor
     public AssignExprStat (Expr expr, Expr expr2) {
         this.expr = expr;
         this.expr2 = expr2;

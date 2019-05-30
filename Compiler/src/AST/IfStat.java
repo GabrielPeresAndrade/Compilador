@@ -9,11 +9,15 @@ import java.util.*;
 
  */
 public class IfStat {
+    //Atriubtos
     private Expr expr;
     private StatList statList;
+    private StatList statList2;
     
-    public IfStat (Expr expr, StatList statList) {
+    //Construtor
+    public IfStat (Expr expr, StatList statList, StatList statList2) {
         this.expr = expr;
         this.statList = statList;
+        this.statList = statList2;
     }
 }

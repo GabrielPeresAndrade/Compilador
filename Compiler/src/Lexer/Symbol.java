@@ -43,7 +43,9 @@ public enum Symbol {
     FALSE("false"),
     EOF("eof"),
     CHARACTER("character"),
-    NUMBER("Number");
+    NUMBER("Number"),
+    VERDADEIRO("true"),
+    FALSO("false");
     
     Symbol(String name) 
     {

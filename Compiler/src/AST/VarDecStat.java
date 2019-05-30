@@ -9,9 +9,11 @@ import java.util.*;
 
  */
 public class VarDecStat {
+    //Atriubotls
     private String id;
     private Type type;
     
+    //Cosntrutor
     public VarDecStat (String id, Type type) {
         this.id = id;
         this.type = type;

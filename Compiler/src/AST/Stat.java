@@ -9,12 +9,14 @@ import java.util.*;
 
  */
 public class Stat {
+    //Atriubots
     private AssignExprStat assignExprStat;
     private ReturnStat returnStat;
     private VarDecStat varDecStat;
     private IfStat ifStat;
     private WhileStat whileStat;
     
+    //Construtor
     public Stat (AssignExprStat assingExprStat, ReturnStat retrunStat, VarDecStat varDecStat, IfStat ifstat, WhileStat whileStat) {
         this.assignExprStat = assignExprStat;
         this.returnStat = returnStat;

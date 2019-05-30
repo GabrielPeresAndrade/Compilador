@@ -8,14 +8,12 @@ import java.util.*;
  * @author Igor Inácio de Carvalho Silva 725804
 
  */
-public class Expr {
+public class ExprUnary {
     //Atributos
-    private ExprAnd exprAnd;
-    private ExprAnd exprAnd2;
+    private ExprPrimary exprPrimary;
     
     //Construtor
-    public Expr (ExprAnd exprAnd, ExprAnd exprAnd2) {
-        this.exprAnd = exprAnd;
-        this.exprAnd2 = exprAnd2;
-    }     
+    public ExprUnary (ExprPrimary exprPrimary) {
+        this.exprPrimary = exprPrimary;
+    }
 }

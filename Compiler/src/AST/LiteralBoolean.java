@@ -6,12 +6,12 @@ package AST;
  * @author Gabriel Peres de Andrade  726517
  * @author Igor Inácio de Carvalho Silva 725804
  */
-public class Type {
+public class LiteralBoolean {
     //Atributos
-    private String name;
+    private String bool;
     
     //Construtor
-    public Type( String name ) {
-        this.name = name;
+    public LiteralBoolean( String bool ) {
+        this.bool = bool;
     }
 }
