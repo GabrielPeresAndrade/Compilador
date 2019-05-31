@@ -293,7 +293,6 @@ public class Compiler {
         if (lexer.token.equals(Symbol.RETURN)) {
             lexer.nextToken();
             expr = expr();
-            
             //Verfica se há o ;
             if (!lexer.token.equals(Symbol.PONTOVIRGULA)) {
                 error.signal("Erro: esperando ';'");
@@ -525,21 +524,26 @@ public class Compiler {
     //ExprMult ::= ExprUnary {(” ∗ ” | ”/”)ExprUnary}
     private ExprMult exprMult() {
         //Mostra a chamada desse nó (Temporário)
+        ArrayList<ExprUnary> arrayExprUnary = new ArrayList<>();
+        ArrayList<Symbol> arraySymbol = new ArrayList<>();
+        
         System.out.println("exprMult");
         
         //Declaração de variáveis
         ExprUnary exprUnary = null;
-        ExprUnary exprUnary2 = null;
-        
+        Symbol symbol ;
         //Chama o primeiro expr unary
-        exprUnary = exprUnary();
+        arrayExprUnary.add(exprUnary());
 
         //Verifica se há um + ou - 
-        if (lexer.token.equals(Symbol.MULT) || lexer.token.equals(Symbol.DIV)) {
-            exprUnary2 = exprUnary();
+        while (lexer.token.equals(Symbol.MULT) || lexer.token.equals(Symbol.DIV)) {
+            symbol = lexer.token;
             lexer.nextToken();
+            arraySymbol.add(symbol);
+            arrayExprUnary.add(exprUnary());
         }
-        return new ExprMult(exprUnary, exprUnary2);
+        
+        return new ExprMult(arrayExprUnary,arraySymbol);
     } 
     
     //ExprUnary ::= [ ( "+" | "-" ) ] ExprPrimary
@@ -556,6 +560,7 @@ public class Compiler {
         }
         
         exprPrimary = exprPrimary();
+        
         return new ExprUnary(exprPrimary);
     } 
     
@@ -577,8 +582,7 @@ public class Compiler {
             
             //Se o próximo token for um "(" é uma chamada de função
             if (lexer.token.equals(Symbol.ABREPAR)) {
-                id = "";
-                funcCall = funcCall();
+                funcCall = funcCall(id);
             }
         }
         //Se não for um id, etnão chamada o ExprLiteral
@@ -651,42 +655,34 @@ public class Compiler {
     }
     
     //FuncCall ::= Id "(" [ Expr {”, ”Expr} ] ")"
-    private FuncCall funcCall ()    {     
+    private FuncCall funcCall (String id)    {     
         //Mostra a chamada desse nó (Temporário)
         System.out.println("funcCall");
         
         //Declaração de variáveis
-        String id = "";
         Expr expr = null;
         Expr expr2 = null;
-        
-        //Verifca se é um identifcador
-        if (lexer.token.equals(Symbol.IDENT)) {
-            id = lexer.getStringValue();
+       
+        //Verifica se abriu o parenteses
+        if (lexer.token.equals(Symbol.ABREPAR)) {
             lexer.nextToken();
-            
-            //Verifica se abriu o parenteses
-            if (lexer.token.equals(Symbol.ABREPAR)) {
-                expr = expr();
-                
-                //Verfica se há uma virgula
-                if (lexer.token.equals(Symbol.VIRGULA)) {
-                    expr2 = expr();
-                }
-                
-                //Verifica se fechou o parenteses
-                if (!lexer.token.equals(Symbol.FECHAPAR)) {
-                    error.signal("Erro: esperando um ')'");
-                }
+            expr = expr();
+
+            //Verfica se há uma virgula
+            if (lexer.token.equals(Symbol.VIRGULA)) {
+                lexer.nextToken();
+                expr2 = expr();
             }
-            //Se não abriu parênteses, acusa o erro
-            else {
-                error.signal("Erro: esprando um '('");
+
+            //Verifica se fechou o parenteses
+            if (!lexer.token.equals(Symbol.FECHAPAR)) {
+                error.signal("Erro: esperando um ')'");
             }
+            lexer.nextToken();
         }
-        //Se não for um id
-        else  {
-            error.signal("Erro: esperando um 'identificador'");
+        //Se não abriu parênteses, acusa o erro
+        else {
+            error.signal("Erro: esprando um '('");
         }
         
         return new FuncCall(id, expr, expr2);

@@ -1,6 +1,6 @@
 package AST;
 import java.util.*;
-
+import Lexer.Symbol;
 /**
  *
  * @author Angelo Bezerra de Souza 726496
@@ -10,12 +10,11 @@ import java.util.*;
  */
 public class ExprMult {
    //Atributos
-   private ExprUnary exprUnary;
-   private ExprUnary exprUnary2;
-   
+   private ArrayList<ExprUnary> exprUnary = new ArrayList<>();
+   private ArrayList<Symbol> symbol = new ArrayList<>();
    //Construtor
-   public ExprMult(ExprUnary exprUnary, ExprUnary exprUnary2) {
+   public ExprMult(ArrayList<ExprUnary> exprUnary,ArrayList<Symbol>symbol) {
        this.exprUnary = exprUnary;
-       this.exprUnary2 = exprUnary2;
+       this.symbol = symbol;
    }
 }
