@@ -206,10 +206,13 @@ public class Compiler {
         if (lexer.token.equals(Symbol.ABRECHAVE)) {
             lexer.nextToken();
             //Adiciona os stat na lista, se houver
-            while(lexer.token.equals(Symbol.RETURN) || lexer.token.equals(Symbol.VAR) || lexer.token.equals(Symbol.IF) || lexer.token.equals(Symbol.WHILE)) { //FICOU FALTANDO AS POSSIBILIDADES DE ASSINGEXPRSTAT
-                statList.add(stat());
+            while(lexer.token.equals(Symbol.RETURN)
+                 || lexer.token.equals(Symbol.VAR)
+                 || lexer.token.equals(Symbol.IF)
+                 || lexer.token.equals(Symbol.WHILE)){ //FICOU FALTANDO AS POSSIBILIDADES DE ASSINGEXPRSTAT
+                statList.add(stat());          
             }
-            
+            lexer.nextToken();
             //Verifica se fechou as chaves
             if (!lexer.token.equals(Symbol.FECHACHAVE)) {
                 error.signal("Erro: esperando um '}'");
@@ -219,7 +222,6 @@ public class Compiler {
         else {
             error.signal("Erro: esperando um '{'");
         }
-   
         return new StatList(statList);
     }
     
@@ -234,8 +236,8 @@ public class Compiler {
         VarDecStat varDecStat = null;
         IfStat ifStat = null;
         WhileStat whileStat = null;
-        
-        switch (lexer.token) {
+
+        switch (lexer.token){
             case RETURN:
                returnStat = returnStat(); 
             break;
@@ -367,7 +369,7 @@ public class Compiler {
             
             expr = expr();
             statList = statList();
-            
+            lexer.nextToken();
             //Verifica se há um "else"
             if (lexer.token.equals(Symbol.ELSE)) {
                 lexer.nextToken();
@@ -511,9 +513,7 @@ public class Compiler {
         ExprMult exprMult2 = null;
         
         //Chama o primeiro expr mult
-        //System.out.println("token atual:"+lexer.token);
         exprMult = exprMult();
-
         //Verifica se há um + ou - 
         if (lexer.token.equals(Symbol.PLUS) || lexer.token.equals(Symbol.MINUS)) {
             exprMult2 = exprMult();
@@ -539,7 +539,6 @@ public class Compiler {
             exprUnary2 = exprUnary();
             lexer.nextToken();
         }
-        //System.out.println("token atual:"+lexer.token);
         return new ExprMult(exprUnary, exprUnary2);
     } 
     
@@ -571,12 +570,12 @@ public class Compiler {
         ExprLiteral exprLiteral = null;
         
         //Se for um identificador, ou é apenas um identifcador ou é uma FuncCall
-        if(lexer.token.equals(Symbol.IDENT)) {
+        if(lexer.token.equals(Symbol.IDENT)){
             //Salva o valor do identificador
             id = lexer.getStringValue();
             lexer.nextToken();
             
-            //Se o próximo token for um "(" é uma chaamda de função
+            //Se o próximo token for um "(" é uma chamada de função
             if (lexer.token.equals(Symbol.ABREPAR)) {
                 id = "";
                 funcCall = funcCall();
@@ -593,6 +592,7 @@ public class Compiler {
     
     //ExprLiteral ::= LiteralInt | LiteralBoolean | LiteralString
     private ExprLiteral exprLiteral () {
+        
         //Mostra a chamada desse nó (Temporário)
         System.out.println("exprLiteral");
         
