@@ -1,5 +1,5 @@
-function fatorial(n: Int) -> int {
-	if n<= 0 {
+function fatorial(n: Int) -> Int {
+	if n <= 0 {
 		return 1;
 	}
 	else {

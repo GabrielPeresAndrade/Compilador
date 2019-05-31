@@ -84,7 +84,7 @@ public class Main
             } 
             catch ( RuntimeException e ) 
             {
-                System.out.println(e);
+                System.out.println("Exception:"+e);
             }
         }
     }

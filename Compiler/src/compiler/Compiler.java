@@ -42,7 +42,8 @@ public class Compiler {
         ArrayList<Func> arrayFunc = new ArrayList();
         
         //Adiciona 0 ou mais funções ao vetor de funções
-        while (lexer.token.equals(Symbol.EOF)) {
+        while (!lexer.token.equals(Symbol.EOF)) {
+            
             arrayFunc.add(func());
             lexer.nextToken();
         }
@@ -80,13 +81,13 @@ public class Compiler {
                     lexer.nextToken();
                     // Recebe lista de parâmetros
                     paramList = paramList();
-                    
                     //Se o parenteses não foi fechado, mostra o erro
                     if (!lexer.token.equals(Symbol.FECHAPAR)) {
                         error.signal("Erro: Esperando ')'");
                     }
                     //Se o parênteses foi fechado, chama o nextToken
                     else {
+                        
                         lexer.nextToken();
                     }
                 }
@@ -95,6 +96,7 @@ public class Compiler {
                 if (lexer.token.equals(Symbol.ARROW)) {
                     lexer.nextToken();
                     type = type();
+                    lexer.nextToken();
                 }
                 
                 //Recebe o statList
@@ -129,6 +131,7 @@ public class Compiler {
         //Enquanto houver parâmetros, adiciona-os ao vetor
         while (lexer.token.equals(Symbol.VIRGULA)) {
             paramList.add(paramDec());
+            lexer.nextToken();
         }
         
         //Retorna o array de parâmetros
@@ -148,6 +151,7 @@ public class Compiler {
         if (lexer.token.equals(Symbol.IDENT)){
             id = lexer.getStringValue();
             lexer.nextToken();
+            
             //Vefica se há os dois pontos
             if (lexer.token.equals(Symbol.DOISPONTOS)) {
                 lexer.nextToken();
@@ -161,6 +165,7 @@ public class Compiler {
         else {
             error.signal("Erro: Esperando um 'identificador'");
         }
+        
         return new ParamDec(id, type);
     }
     
@@ -184,8 +189,8 @@ public class Compiler {
             break;
             default :
                 error.signal("Erro: Tipo Inválido");
-            }
-        lexer.nextToken();
+        }
+        
         return new Type(name);  
     }
     
@@ -453,11 +458,11 @@ public class Compiler {
         
         //Recebe a primeira expr
         exprAdd = exprAdd();
-        
-        relOp = relOp();
-        
-        exprAdd2 = exprAdd();
-            
+
+        while(lexer.token.equals(Symbol.LT) || lexer.token.equals(Symbol.LE) || lexer.token.equals(Symbol.GT) || lexer.token.equals(Symbol.GE) || lexer.token.equals(Symbol.EQ) || lexer.token.equals(Symbol.NEQ)) {
+            relOp = relOp();
+            exprAdd2 = exprAdd();
+        }   
     
         return new ExprRel(exprAdd, relOp, exprAdd2); 
     }
@@ -506,8 +511,9 @@ public class Compiler {
         ExprMult exprMult2 = null;
         
         //Chama o primeiro expr mult
+        //System.out.println("token atual:"+lexer.token);
         exprMult = exprMult();
-        
+
         //Verifica se há um + ou - 
         if (lexer.token.equals(Symbol.PLUS) || lexer.token.equals(Symbol.MINUS)) {
             exprMult2 = exprMult();
@@ -527,12 +533,13 @@ public class Compiler {
         
         //Chama o primeiro expr unary
         exprUnary = exprUnary();
-        
+
         //Verifica se há um + ou - 
         if (lexer.token.equals(Symbol.MULT) || lexer.token.equals(Symbol.DIV)) {
             exprUnary2 = exprUnary();
+            lexer.nextToken();
         }
-        
+        //System.out.println("token atual:"+lexer.token);
         return new ExprMult(exprUnary, exprUnary2);
     } 
     
@@ -546,12 +553,10 @@ public class Compiler {
         
         //Verfica se há um + ou -
         if (lexer.token.equals(Symbol.PLUS) || lexer.token.equals(Symbol.MINUS)) {
-            exprPrimary = exprPrimary();
-        }
-        else {
-            error.signal("Erro: espernado operador '+' ou '-'");
+            lexer.nextToken();
         }
         
+        exprPrimary = exprPrimary();
         return new ExprUnary(exprPrimary);
     } 
     
@@ -569,9 +574,9 @@ public class Compiler {
         if(lexer.token.equals(Symbol.IDENT)) {
             //Salva o valor do identificador
             id = lexer.getStringValue();
-            
-            //Vai para o próximo char, pois se for um "(" é uma chaamda de função
             lexer.nextToken();
+            
+            //Se o próximo token for um "(" é uma chaamda de função
             if (lexer.token.equals(Symbol.ABREPAR)) {
                 id = "";
                 funcCall = funcCall();
@@ -579,7 +584,8 @@ public class Compiler {
         }
         //Se não for um id, etnão chamada o ExprLiteral
         else {
-            exprLiteral = exprLiteral();   
+            exprLiteral = exprLiteral();
+            lexer.nextToken();
         }
         
         return new ExprPrimary(id, funcCall, exprLiteral);

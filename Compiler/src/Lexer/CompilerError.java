@@ -27,7 +27,7 @@ public class CompilerError {
     
     public void show( String strMessage ) 
     {
-        show( strMessage, false );
+        show( strMessage, true );
     }
     
     public void show( String strMessage, boolean goPreviousToken ) 
@@ -53,7 +53,7 @@ public class CompilerError {
     
     public void signal( String strMessage ) 
     {
-        show( strMessage );
+        show(strMessage );
         out.flush();
         thereWasAnError = true;
         throw new RuntimeException();
