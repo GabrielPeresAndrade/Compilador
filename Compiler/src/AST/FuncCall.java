@@ -11,13 +11,11 @@ import java.util.*;
 public class FuncCall {
     //Atributos
     private String id;
-    private Expr expr;
-    private Expr expr2;
+    private ArrayList<Expr> exprs = new ArrayList();
     
     //Construtor
-    public FuncCall(String id, Expr expr, Expr expr2) {
+    public FuncCall(String id, ArrayList<Expr> exprs) {
         this.id = id;
-        this.expr = expr;
-        this.expr2 = expr2;
+        this.exprs = exprs;
     }
 }

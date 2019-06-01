@@ -10,12 +10,10 @@ import java.util.*;
  */
 public class ExprAnd {
     //Atributos
-    private ExprRel exprRel;
-    private ExprRel exprRel2;
+    private ArrayList<ExprRel> exprsRel= new ArrayList();
     
     //Construtor
-    public ExprAnd (ExprRel exprRel, ExprRel exprRel2) {
-        this.exprRel = exprRel;
-        this.exprRel2 = exprRel2;
+    public ExprAnd (ArrayList<ExprRel> exprsRel) {
+        this.exprsRel = exprsRel;
     }     
 }

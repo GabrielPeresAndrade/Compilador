@@ -204,19 +204,22 @@ public class Compiler {
         
         //Verfica se o token é um abre
         if (lexer.token.equals(Symbol.ABRECHAVE)) {
+            System.out.println("JOLONGAAAAAAAAAAAAAAAAAAA"+lexer.token);
             lexer.nextToken();
             //Adiciona os stat na lista, se houver
-            while(lexer.token.equals(Symbol.RETURN)
-                 || lexer.token.equals(Symbol.VAR)
-                 || lexer.token.equals(Symbol.IF)
-                 || lexer.token.equals(Symbol.WHILE)){ //FICOU FALTANDO AS POSSIBILIDADES DE ASSINGEXPRSTAT
-                statList.add(stat());          
+            while(lexer.token.equals(Symbol.RETURN) ||
+                  lexer.token.equals(Symbol.VAR) ||
+                  lexer.token.equals(Symbol.IF) ||
+                  lexer.token.equals(Symbol.WHILE) ||
+                  lexer.token.equals(Symbol.IDENT)){ //IDENT É PARA QUANDO FOR ASSIGNEXPRSTAT
+                statList.add(stat());
             }
-            lexer.nextToken();
+
             //Verifica se fechou as chaves
             if (!lexer.token.equals(Symbol.FECHACHAVE)) {
                 error.signal("Erro: esperando um '}'");
             }
+            lexer.nextToken();
         }
         //Se não for acusa erro
         else {
@@ -229,7 +232,7 @@ public class Compiler {
     private Stat stat(){
         //Mostra a chamada desse nó (Temporário)
         System.out.println("Stat");
-        
+                                        
         //Declaração de variáveis
         AssignExprStat assignExprStat = null;
         ReturnStat returnStat = null;
@@ -250,6 +253,9 @@ public class Compiler {
             case WHILE:
                 whileStat = whileStat();
             break;
+            case IDENT:
+                assignExprStat = assignExprStat();
+            break;
             default: error.signal("Erro: comando inválido"); 
         }
         return new Stat(assignExprStat, returnStat, varDecStat, ifStat, whileStat);
@@ -268,9 +274,10 @@ public class Compiler {
         expr = expr();
         
         //Verfica se há uma atribuição;
-        if (lexer.token.equals(Symbol.EQ)) {
+        if (lexer.token.equals(Symbol.ASSIGN)) {
             lexer.nextToken();
             expr2 = expr();
+            lexer.nextToken();
         }
         
         //Verfica se há o ;
@@ -288,7 +295,7 @@ public class Compiler {
         
         //Declaração de variáveis
         Expr expr = null;
-        
+
         //Verifica se há o return
         if (lexer.token.equals(Symbol.RETURN)) {
             lexer.nextToken();
@@ -297,6 +304,7 @@ public class Compiler {
             if (!lexer.token.equals(Symbol.PONTOVIRGULA)) {
                 error.signal("Erro: esperando ';'");
             }
+            lexer.nextToken();
         }
         //Se não encontrar o "return"
         else {
@@ -328,6 +336,7 @@ public class Compiler {
                 if (lexer.token.equals(Symbol.DOISPONTOS)) {
                     lexer.nextToken();
                     type = type();
+                    lexer.nextToken();
                     
                     //Verfica se há o ;
                     if (!lexer.token.equals(Symbol.PONTOVIRGULA)) {
@@ -368,7 +377,6 @@ public class Compiler {
             
             expr = expr();
             statList = statList();
-            lexer.nextToken();
             //Verifica se há um "else"
             if (lexer.token.equals(Symbol.ELSE)) {
                 lexer.nextToken();
@@ -413,18 +421,18 @@ public class Compiler {
         System.out.println("Expr");
         
         //Declaração de variáveis
-        ExprAnd exprAnd = null;
-        ExprAnd exprAnd2 = null;
+        ArrayList<ExprAnd> exprsAnd = new ArrayList();
         
         //Recebe a primeira expr
-        exprAnd = exprAnd();
+        exprsAnd.add(exprAnd());
         
-        //Verifca se há um "or"
-        if (lexer.token.equals(Symbol.OR)) {
-            exprAnd2 = exprAnd();
+        //While houver "or" adiciona um novo exprAnd
+        while(lexer.token.equals(Symbol.OR)) {
+            lexer.nextToken();
+            exprsAnd.add(exprAnd());
         }
     
-        return new Expr(exprAnd, exprAnd2); 
+        return new Expr(exprsAnd); 
     }
     
     //ExprAnd ::= ExprRel {”and”ExprRel}
@@ -433,18 +441,18 @@ public class Compiler {
         System.out.println("ExprAnd");
         
         //Declaração de variáveis
-        ExprRel exprRel = null;
-        ExprRel exprRel2 = null;
+        ArrayList<ExprRel> exprsRel = new ArrayList();
         
         //Recebe a primeira expr
-        exprRel = exprRel();
-        
+        exprsRel.add(exprRel());
+
         //Verifca se há um "and"
-        if (lexer.token.equals(Symbol.AND)) {
-            exprRel2 = exprRel();
+        while(lexer.token.equals(Symbol.AND)) {
+            lexer.nextToken();
+            exprsRel.add(exprRel());
         }
-    
-        return new ExprAnd(exprRel, exprRel2); 
+
+        return new ExprAnd(exprsRel); 
     }
     
     //ExprRel ::= ExprAdd [ RelOp ExprAdd ]
@@ -460,11 +468,16 @@ public class Compiler {
         //Recebe a primeira expr
         exprAdd = exprAdd();
 
-        while(lexer.token.equals(Symbol.LT) || lexer.token.equals(Symbol.LE) || lexer.token.equals(Symbol.GT) || lexer.token.equals(Symbol.GE) || lexer.token.equals(Symbol.EQ) || lexer.token.equals(Symbol.NEQ)) {
+        if (lexer.token.equals(Symbol.LT) ||
+              lexer.token.equals(Symbol.LE) ||
+              lexer.token.equals(Symbol.GT) ||
+              lexer.token.equals(Symbol.GE) ||
+              lexer.token.equals(Symbol.EQ) ||
+              lexer.token.equals(Symbol.NEQ)) {
             relOp = relOp();
             exprAdd2 = exprAdd();
         }   
-    
+
         return new ExprRel(exprAdd, relOp, exprAdd2); 
     }
     
@@ -508,17 +521,18 @@ public class Compiler {
         System.out.println("ExprAdd");
         
         //Declaração de variáveis
-        ExprMult exprMult = null;
-        ExprMult exprMult2 = null;
+        ArrayList<ExprMult> exprsMult = new ArrayList();
         
         //Chama o primeiro expr mult
-        exprMult = exprMult();
+        exprsMult.add(exprMult());
+        
         //Verifica se há um + ou - 
-        if (lexer.token.equals(Symbol.PLUS) || lexer.token.equals(Symbol.MINUS)) {
-            exprMult2 = exprMult();
+        while (lexer.token.equals(Symbol.PLUS) || lexer.token.equals(Symbol.MINUS)) {
+            lexer.nextToken();
+            exprsMult.add(exprMult());
         }
         
-        return new ExprAdd(exprMult, exprMult2);
+        return new ExprAdd(exprsMult);
     }   
     
     //ExprMult ::= ExprUnary {(” ∗ ” | ”/”)ExprUnary}
@@ -531,7 +545,8 @@ public class Compiler {
         
         //Declaração de variáveis
         ExprUnary exprUnary = null;
-        Symbol symbol ;
+        Symbol symbol;
+        
         //Chama o primeiro expr unary
         arrayExprUnary.add(exprUnary());
 
@@ -588,7 +603,6 @@ public class Compiler {
         //Se não for um id, etnão chamada o ExprLiteral
         else {
             exprLiteral = exprLiteral();
-            lexer.nextToken();
         }
         
         return new ExprPrimary(id, funcCall, exprLiteral);
@@ -608,6 +622,7 @@ public class Compiler {
         switch (lexer.token) {
             case NUMBER:
                 literalInt = lexer.getNumberValue();
+                lexer.nextToken();
             break;
             case VERDADEIRO:
                 literalBool = literalBoolean();
@@ -660,18 +675,17 @@ public class Compiler {
         System.out.println("funcCall");
         
         //Declaração de variáveis
-        Expr expr = null;
-        Expr expr2 = null;
+        ArrayList<Expr> exprs = new ArrayList();
        
         //Verifica se abriu o parenteses
         if (lexer.token.equals(Symbol.ABREPAR)) {
             lexer.nextToken();
-            expr = expr();
+            exprs.add(expr());
 
             //Verfica se há uma virgula
-            if (lexer.token.equals(Symbol.VIRGULA)) {
+            while (lexer.token.equals(Symbol.VIRGULA)) {
                 lexer.nextToken();
-                expr2 = expr();
+                exprs.add(expr());
             }
 
             //Verifica se fechou o parenteses
@@ -685,7 +699,7 @@ public class Compiler {
             error.signal("Erro: esprando um '('");
         }
         
-        return new FuncCall(id, expr, expr2);
+        return new FuncCall(id, exprs);
         
     }
 }

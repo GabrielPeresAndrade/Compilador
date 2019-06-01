@@ -10,12 +10,10 @@ import java.util.*;
  */
 public class ExprAdd {
    //Atributos
-   private ExprMult exprMult;
-   private ExprMult exprMult2;
+   private ArrayList<ExprMult> exprsMult = new ArrayList();
     
    //Construtor
-   public ExprAdd (ExprMult exptMult, ExprMult exptMult2) {
-       this.exprMult = exprMult;
-       this.exprMult2 = exprMult2;
+   public ExprAdd (ArrayList<ExprMult> exprsMult) {
+       this.exprsMult = exprsMult;
    }
 }
