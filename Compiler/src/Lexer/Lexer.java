@@ -190,13 +190,24 @@ public class Lexer {
                         case ':' :
                             token = Symbol.DOISPONTOS;
                         break;
-                        case '\'' :
+                        case '"' :
                             token = Symbol.CHARACTER;
-                            charValue = input[tokenPos];
+                            StringBuffer ident = new StringBuffer();
+                            ident.append('"');
+                            while ( input[tokenPos] != '"' ) {
+                                if(input[tokenPos] == '\0')
+                                {
+                                    error.signal("String não terminou");
+                                }
+                                ident.append(input[tokenPos]);
+                                tokenPos++;
+                            }
+                            ident.append('"');
                             tokenPos++;
-                            if ( input[tokenPos] != '\'' )
-                                error.signal("Illegal literal character" + input[tokenPos-1] );
-                            tokenPos++;
+                            stringValue = ident.toString();
+                            // if identStr is in the list of keywords, it is a keyword !
+                            Symbol value = keywordsTable.get(stringValue);
+
                         break;
                         // the next four symbols are not used by the language
                         // but are returned to help the error treatment

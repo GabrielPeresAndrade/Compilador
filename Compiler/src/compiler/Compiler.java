@@ -43,9 +43,7 @@ public class Compiler {
         
         //Adiciona 0 ou mais funções ao vetor de funções
         while (!lexer.token.equals(Symbol.EOF)) {
-            
             arrayFunc.add(func());
-            lexer.nextToken();
         }
         
             
@@ -81,6 +79,7 @@ public class Compiler {
                     lexer.nextToken();
                     // Recebe lista de parâmetros
                     paramList = paramList();
+                    
                     //Se o parenteses não foi fechado, mostra o erro
                     if (!lexer.token.equals(Symbol.FECHAPAR)) {
                         error.signal("Erro: Esperando ')'");
@@ -96,7 +95,6 @@ public class Compiler {
                 if (lexer.token.equals(Symbol.ARROW)) {
                     lexer.nextToken();
                     type = type();
-                    lexer.nextToken();
                 }
                 
                 //Recebe o statList
@@ -126,12 +124,11 @@ public class Compiler {
         
         //Adiciona o parâmetro
         paramList.add(paramDec());
-        lexer.nextToken();
 
         //Enquanto houver parâmetros, adiciona-os ao vetor
         while (lexer.token.equals(Symbol.VIRGULA)) {
-            paramList.add(paramDec());
             lexer.nextToken();
+            paramList.add(paramDec());
         }
         
         //Retorna o array de parâmetros
@@ -191,6 +188,8 @@ public class Compiler {
                 error.signal("Erro: Tipo Inválido");
         }
         
+        lexer.nextToken();
+        
         return new Type(name);  
     }
     
@@ -204,7 +203,6 @@ public class Compiler {
         
         //Verfica se o token é um abre
         if (lexer.token.equals(Symbol.ABRECHAVE)) {
-            System.out.println("JOLONGAAAAAAAAAAAAAAAAAAA"+lexer.token);
             lexer.nextToken();
             //Adiciona os stat na lista, se houver
             while(lexer.token.equals(Symbol.RETURN) ||
@@ -277,13 +275,13 @@ public class Compiler {
         if (lexer.token.equals(Symbol.ASSIGN)) {
             lexer.nextToken();
             expr2 = expr();
-            lexer.nextToken();
         }
         
         //Verfica se há o ;
         if (!lexer.token.equals(Symbol.PONTOVIRGULA)) {
             error.signal("Erro: esperando ';'");
         }
+        lexer.nextToken();
         
         return new AssignExprStat(expr, expr2);
     }
@@ -336,12 +334,12 @@ public class Compiler {
                 if (lexer.token.equals(Symbol.DOISPONTOS)) {
                     lexer.nextToken();
                     type = type();
-                    lexer.nextToken();
                     
                     //Verfica se há o ;
                     if (!lexer.token.equals(Symbol.PONTOVIRGULA)) {
                         error.signal("Erro: esperando ';'");
                     }
+                    lexer.nextToken();
                 }
                 //Se não tiver os dois pontos
                 else {
@@ -630,17 +628,12 @@ public class Compiler {
             case FALSO:
                 literalBool = literalBoolean();
             break;
-            /* PARA O CASO DE STRING, NÃO SEI EXATAMENTE COMO VAI FUNCIONAR
-            case ABREASPAS:
+            case CHARACTER:
                 literalString = lexer.getStringValue();
-                
-                //Chamada o proximo token para ver se fehcou as aspas
                 lexer.nextToken();
-                if (!lexer.token.equals(Symbol.FECHAASPAS)) {
-                    error.signal("Erro: esperando '\"'");
-                }
+                //Chamada o proximo token para ver se fehcou as aspas
+                
             break;
-            */
             default: error.signal("Erro: literal inválido");
         }
         
@@ -687,7 +680,7 @@ public class Compiler {
                 lexer.nextToken();
                 exprs.add(expr());
             }
-
+            
             //Verifica se fechou o parenteses
             if (!lexer.token.equals(Symbol.FECHAPAR)) {
                 error.signal("Erro: esperando um ')'");

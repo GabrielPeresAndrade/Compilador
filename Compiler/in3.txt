@@ -1,4 +1,4 @@
-function fatorial(n: Int) -> int {
+function fatorial(n: Int) -> Int {
 	if n<= 0 {
 		return 1;
 	}
@@ -8,8 +8,8 @@ function fatorial(n: Int) -> int {
 }
 
 function imprima(before: Int, valor: Int, after: String){
-	var Int i;
-	i=0;
+	var i : Int ;
+	i = 0;
 	while i< before {
 		write("*");
 		i = i + 1;
