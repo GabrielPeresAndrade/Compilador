@@ -15,5 +15,5 @@ public class Expr {
     //Construtor
     public Expr (ArrayList<ExprAnd> exprsAnd) {
         this.exprsAnd = exprsAnd;
-    }     
+    }
 }

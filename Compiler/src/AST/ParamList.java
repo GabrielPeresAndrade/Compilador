@@ -16,4 +16,7 @@ public class ParamList {
    public ParamList (ArrayList<ParamDec> arrayParamDec) {
        this.arrayParamDec = arrayParamDec;
    }
+   public int getSize() {
+        return arrayParamDec.size();
+    }
 }

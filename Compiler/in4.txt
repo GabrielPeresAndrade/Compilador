@@ -1,0 +1,10 @@
+
+function imprima(before: Int, valor: Int, after: String){
+	readInt();
+	readString();
+}
+function main {
+	readInt();
+	readString();
+	2 = readInt();
+}

@@ -1,0 +1,3 @@
+Error at line 9: 
+	2 = readInt();
+Atribuição a uma não variavel
