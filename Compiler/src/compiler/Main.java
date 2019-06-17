@@ -81,6 +81,7 @@ public class Main
             try 
             {
                 Program program = compiler.compile(input, printWriter);
+               // System.out.println("acabou");
             } 
             catch ( RuntimeException e ) 
             {

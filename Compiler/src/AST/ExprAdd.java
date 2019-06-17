@@ -16,4 +16,14 @@ public class ExprAdd {
    public ExprAdd (ArrayList<ExprMult> exprsMult) {
        this.exprsMult = exprsMult;
    }
+   
+    public ArrayList<String> getTypes () {
+        ArrayList<String>arrayTypes = new ArrayList(); 
+       for (ExprMult exprsMult1 : this.exprsMult) {
+           for (int j = 0; j < exprsMult1.getTypes().size(); j++) {
+               arrayTypes.add(exprsMult1.getTypes().get(j));
+           }
+       }
+        return arrayTypes;
+    }
 }

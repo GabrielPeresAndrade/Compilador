@@ -17,4 +17,12 @@ public class ExprMult {
        this.exprUnary = exprUnary;
        this.symbol = symbol;
    }
+   
+    public ArrayList<String> getTypes () {
+        ArrayList<String> arrayTypes = new ArrayList(); 
+       for (ExprUnary exprUnary1 : this.exprUnary) {
+           arrayTypes.add(exprUnary1.getType());
+       }
+        return arrayTypes;
+    }
 }

@@ -13,12 +13,18 @@ public class ExprLiteral {
     private int literalInt;
     private LiteralBoolean literalBoolean;
     private String literalString;
+    private String type;
     
     //Construtor
-    public ExprLiteral (int literalInt, LiteralBoolean literalBoolean, String literalString) {
+    public ExprLiteral (int literalInt, LiteralBoolean literalBoolean, String literalString, String type) {
         this.literalInt = literalInt;
         this.literalBoolean = literalBoolean;
         this.literalString = literalString;
+        this.type = type;
+    }
+    
+    public String getType () {
+        return this.type;
     }
     
 }

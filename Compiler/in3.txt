@@ -16,7 +16,7 @@ function imprima(before: Int, valor: Int, after: String){
 	}
 	writeln("");
 	writeln(valor);
-	writeln(after);
+	writeln(after); 
 }
 
 function main {

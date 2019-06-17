@@ -10,16 +10,44 @@ import java.util.*;
  */
 public class Func {
     //Atributos
-    private String id;
-    private ParamList paramList;
-    private Type type;
-    private StatList statList;
+    protected String id;
+    protected ParamList paramList;
+    protected Type type;
+    protected StatList statList;
     
     //Construtor
     public Func (String id, ParamList paramList, Type type, StatList statList) {
         this.id = id;
         this.paramList = paramList;
         this.type = type;
+        this.statList = statList;
+    }
+
+    public Func(String id) {
+        this.id = id;
+    }
+
+    public ParamList getParamList() {
+        return paramList;
+    }
+
+    public void setParamList(ParamList paramList) {
+        this.paramList = paramList;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public StatList getStatList() {
+        return statList;
+    }
+
+    public void setStatList(StatList statList) {
         this.statList = statList;
     }
 }

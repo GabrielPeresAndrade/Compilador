@@ -11,9 +11,10 @@ import java.util.*;
 public class Expr {
     //Atributos
     private ArrayList<ExprAnd> exprsAnd = new ArrayList();
+    private Type type = null;
     
     //Construtor
     public Expr (ArrayList<ExprAnd> exprsAnd) {
         this.exprsAnd = exprsAnd;
-    }     
+    }
 }

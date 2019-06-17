@@ -16,6 +16,8 @@ public class Compiler {
     
     private Lexer lexer;
     private CompilerError error;
+    private SymbolTable symbolTable;
+
     
     public Program compile( char []input, PrintWriter outError ) 
     {
@@ -23,6 +25,22 @@ public class Compiler {
         //Instacia classes
         error = new CompilerError( outError );
         lexer = new Lexer(input, error);
+        symbolTable = new SymbolTable();
+        
+        Type inteiro= new Type("Int");
+        Func readint = new Func("readInt",null,inteiro,null);
+        symbolTable.putInGlobal("readInt", readint);
+        
+        Type string= new Type("String");
+        Func readstring = new Func("readString",null,string,null);
+        symbolTable.putInGlobal("readString", readstring);
+        
+        Func write = new Func("write",null,inteiro,null);
+        symbolTable.putInGlobal("write", write);
+        
+        Func writeln = new Func("writeln",null,inteiro,null);
+        symbolTable.putInGlobal("writeln", writeln);
+           
         error.setLexer(lexer);
 
         //Inicia a leitura dos tokens
@@ -30,6 +48,14 @@ public class Compiler {
         
         //Inicia as chamadas da AST
         Program program = program();
+        
+        Func mainProc ;
+        if ((mainProc = (Func) symbolTable.getInGlobal("main")) == null )
+            error.signal("Source code must have a procedure called main");
+        //else
+        if ( mainProc.getParamList() != null && mainProc.getParamList().getSize() != 0 )
+            error.signal("Não coloque parametros na Main");
+
         return program;
     }
     
@@ -64,7 +90,8 @@ public class Compiler {
         ParamList paramList = null;
         Type type = null;
         StatList statList = null;
-        
+        Func f = null;
+                
         // Verifica se há o "function" obrigatório
         if (lexer.token.equals(Symbol.FUNCTION)) {
             lexer.nextToken();
@@ -73,6 +100,17 @@ public class Compiler {
                 //Salva o nome da fução para enviar ao construtor de func
                 id = lexer.getStringValue();//lexer.token
                 lexer.nextToken();
+                
+                //get pra ver se ja existe
+                f = (Func ) symbolTable.getInGlobal(id);
+                // semantic analysis
+                // identifier is in the symbol table
+                if ( f != null )
+                    error.show("Function " + id + " has already been declared");
+                
+                f = new Func(id);
+                //coloca se nao existe
+                symbolTable.putInGlobal( id, f);
                 
                 //Verifica se há parâmetros
                 if (lexer.token.equals(Symbol.ABREPAR)) {
@@ -109,9 +147,13 @@ public class Compiler {
         else {
             error.signal("Erro: Esperando 'function'");
         }
-        
+        //Semantica
+        symbolTable.removeLocalIdent();
         //Se todas as verificações foram validadas
-        return new Func(id, paramList, type, statList);
+        f.setParamList(paramList);
+        f.setStatList(statList);
+        f.setType(type);
+        return f;
     }
     
     //ParamList ::= ParamDec {”, ”P aramDec}
@@ -157,6 +199,15 @@ public class Compiler {
             else {
                 error.signal("Erro: Esperando um ':'");  
             }
+            //deu bom sintaticamente falando
+            if ( symbolTable.getInLocal(id) != null )
+                error.show("Parameter " + id + " has already been declared");
+                // variable does not have a type yet
+            Variable v = new Variable(id , type);
+                // inserts the variable in the symbol table. The name is the key and an
+                // object of class Variable is the value. Hash tables store a pair (key, value)
+                // retrieved by the key.
+            symbolTable.putInLocal( id, v );
         }
         //Se não houver um nome de variável
         else {
@@ -209,7 +260,9 @@ public class Compiler {
                   lexer.token.equals(Symbol.VAR) ||
                   lexer.token.equals(Symbol.IF) ||
                   lexer.token.equals(Symbol.WHILE) ||
-                  lexer.token.equals(Symbol.IDENT)){ //IDENT É PARA QUANDO FOR ASSIGNEXPRSTAT
+                  lexer.token.equals(Symbol.IDENT) || lexer.token.equals(Symbol.CHARACTER) || 
+                  lexer.token.equals(Symbol.TRUE) || lexer.token.equals(Symbol.NUMBER) ||
+                  lexer.token.equals(Symbol.FALSE)){ //ULTIMOS SÃO  PARA QUANDO FOR ASSIGNEXPRSTAT
                 statList.add(stat());
             }
 
@@ -254,7 +307,20 @@ public class Compiler {
             case IDENT:
                 assignExprStat = assignExprStat();
             break;
+            case TRUE:
+                assignExprStat = assignExprStat();
+            break;
+            case FALSE:
+                assignExprStat = assignExprStat();
+            break;
+            case CHARACTER:
+                assignExprStat = assignExprStat();
+            break;
+            case NUMBER:
+                assignExprStat = assignExprStat();
+            break;
             default: error.signal("Erro: comando inválido"); 
+                break;
         }
         return new Stat(assignExprStat, returnStat, varDecStat, ifStat, whileStat);
     }
@@ -267,7 +333,10 @@ public class Compiler {
         //Declaração de variáveis
         Expr expr = null;
         Expr expr2 = null;
-        
+        boolean flag = false; 
+        if (lexer.token.equals(Symbol.IDENT)) {
+            flag = true;
+        }
         //Recebe o primeiro expr
         expr = expr();
         
@@ -275,6 +344,8 @@ public class Compiler {
         if (lexer.token.equals(Symbol.ASSIGN)) {
             lexer.nextToken();
             expr2 = expr();
+            if(!flag)
+                error.signal("Atribuição a uma não variavel");
         }
         
         //Verfica se há o ;
@@ -355,6 +426,15 @@ public class Compiler {
         else {
             error.signal("Erro: esperando 'var'");
         }
+        //deu bom sintaticamente falando
+        if ( symbolTable.getInLocal(id) != null )
+            error.show("Variable " + id + " has already been declared");
+            // variable does not have a type yet
+        Variable v = new Variable(id , type);
+            // inserts the variable in the symbol table. The name is the key and an
+            // object of class Variable is the value. Hash tables store a pair (key, value)
+            // retrieved by the key.
+        symbolTable.putInLocal( id, v );
         
         return new VarDecStat(id, type);
     }
@@ -430,7 +510,7 @@ public class Compiler {
             exprsAnd.add(exprAnd());
         }
     
-        return new Expr(exprsAnd); 
+        return new Expr(exprsAnd);
     }
     
     //ExprAnd ::= ExprRel {”and”ExprRel}
@@ -616,28 +696,30 @@ public class Compiler {
         int literalInt = -1;
         String literalString = "";
         LiteralBoolean literalBool = null;
-        
+        String type = "";
         switch (lexer.token) {
             case NUMBER:
                 literalInt = lexer.getNumberValue();
                 lexer.nextToken();
+                type = "Int";
             break;
-            case VERDADEIRO:
+            case TRUE:
                 literalBool = literalBoolean();
+                type = "Boolean";
             break;
-            case FALSO:
+            case FALSE:
                 literalBool = literalBoolean();
+                type = "String";
             break;
             case CHARACTER:
                 literalString = lexer.getStringValue();
                 lexer.nextToken();
-                //Chamada o proximo token para ver se fehcou as aspas
                 
             break;
             default: error.signal("Erro: literal inválido");
         }
         
-        return new ExprLiteral(literalInt, literalBool, literalString);
+        return new ExprLiteral(literalInt, literalBool, literalString, type);
     }
     
     //LiteralBoolean ::= "true" | "false"
@@ -649,10 +731,10 @@ public class Compiler {
         String bool = "";
         
         switch (lexer.token) {
-            case VERDADEIRO :
+            case TRUE :
                 bool = "true";
             break;
-            case FALSO :
+            case FALSE :
                 bool = "false";
             break;
             default :
@@ -669,18 +751,25 @@ public class Compiler {
         
         //Declaração de variáveis
         ArrayList<Expr> exprs = new ArrayList();
-       
+        
+        //ve se a função ja foi definida
+        Func funcao ;
+        if ((funcao = (Func) symbolTable.getInGlobal(id)) == null )
+        {
+            error.signal("Função não definida");
+        }
         //Verifica se abriu o parenteses
         if (lexer.token.equals(Symbol.ABREPAR)) {
             lexer.nextToken();
-            exprs.add(expr());
-
-            //Verfica se há uma virgula
-            while (lexer.token.equals(Symbol.VIRGULA)) {
-                lexer.nextToken();
+            if (!lexer.token.equals(Symbol.FECHAPAR)) {
                 exprs.add(expr());
+
+                //Verfica se há uma virgula
+                while (lexer.token.equals(Symbol.VIRGULA)) {
+                    lexer.nextToken();
+                    exprs.add(expr());
+                }
             }
-            
             //Verifica se fechou o parenteses
             if (!lexer.token.equals(Symbol.FECHAPAR)) {
                 error.signal("Erro: esperando um ')'");

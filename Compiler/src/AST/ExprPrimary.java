@@ -20,4 +20,8 @@ public class ExprPrimary {
         this.funcCall = funcCall;
         this.exprLiteral = exprLiteral;
     }
+    
+    public String getType () {
+        return exprLiteral.getType();
+    }
 }

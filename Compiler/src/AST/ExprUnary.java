@@ -16,4 +16,8 @@ public class ExprUnary {
     public ExprUnary (ExprPrimary exprPrimary) {
         this.exprPrimary = exprPrimary;
     }
+    
+    public String getType () {
+        return this.exprPrimary.getType();
+    }
 }
