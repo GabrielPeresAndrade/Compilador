@@ -19,11 +19,11 @@ public class Compiler {
     private SymbolTable symbolTable;
 
     
-    public Program compile( char []input, PrintWriter outError ) 
+    public Program compile( char []input, PrintWriter outError ,String arquivo) 
     {
 
         //Instacia classes
-        error = new CompilerError( outError );
+        error = new CompilerError( outError, arquivo);
         lexer = new Lexer(input, error);
         symbolTable = new SymbolTable();
         
@@ -35,10 +35,11 @@ public class Compiler {
         Func readstring = new Func("readString",null,string,null);
         symbolTable.putInGlobal("readString", readstring);
         
-        Func write = new Func("write",null,inteiro,null);
+        Type voide = new Type("Void");
+        Func write = new Func("write",null,voide,null);
         symbolTable.putInGlobal("write", write);
         
-        Func writeln = new Func("writeln",null,inteiro,null);
+        Func writeln = new Func("writeln",null,voide,null);
         symbolTable.putInGlobal("writeln", writeln);
            
         error.setLexer(lexer);
@@ -344,8 +345,11 @@ public class Compiler {
         if (lexer.token.equals(Symbol.ASSIGN)) {
             lexer.nextToken();
             expr2 = expr();
+            
             if(!flag)
                 error.signal("Atribuição a uma não variavel");
+            if (expr.getType() != expr2.getType())
+                error.signal("Tipos incompativeis");               
         }
         
         //Verfica se há o ;
@@ -700,7 +704,6 @@ public class Compiler {
         switch (lexer.token) {
             case NUMBER:
                 literalInt = lexer.getNumberValue();
-                lexer.nextToken();
                 type = "Int";
             break;
             case TRUE:
@@ -709,14 +712,15 @@ public class Compiler {
             break;
             case FALSE:
                 literalBool = literalBoolean();
-                type = "String";
+                type = "Boolean";
             break;
             case CHARACTER:
                 literalString = lexer.getStringValue();
-                lexer.nextToken();
-                
+                type = "String";
+                lexer.nextToken();   
             break;
             default: error.signal("Erro: literal inválido");
+            break;
         }
         
         return new ExprLiteral(literalInt, literalBool, literalString, type);

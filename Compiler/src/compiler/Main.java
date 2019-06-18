@@ -80,7 +80,7 @@ public class Main
             // the generated code goes to a file and so are the errors
             try 
             {
-                Program program = compiler.compile(input, printWriter);
+                Program program = compiler.compile(input, printWriter, args[0]);
                // System.out.println("acabou");
             } 
             catch ( RuntimeException e ) 

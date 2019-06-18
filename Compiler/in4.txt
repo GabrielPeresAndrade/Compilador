@@ -4,7 +4,8 @@ function imprima(before: Int, valor: Int, after: String){
 	readString();
 }
 function main {
+	var a Int;
 	readInt();
 	readString();
-	2 = readInt();
+	a = readInt();
 }

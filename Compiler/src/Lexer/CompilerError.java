@@ -7,11 +7,13 @@ public class CompilerError {
     private Lexer lexer;
     private PrintWriter out;
     private boolean thereWasAnError;
+    private String arquivo;
 
-    public CompilerError( PrintWriter out ) 
+    public CompilerError( PrintWriter out ,String arquivo) 
     {
         // output of an error is done in out
         this.out = out;
+        this.arquivo = arquivo;
         thereWasAnError = false;
     }
     
@@ -36,15 +38,16 @@ public class CompilerError {
         // previous token, not the last one.
         if ( goPreviousToken ) 
         {
-            out.println("Error at line " + lexer.getLineNumberBeforeLastToken() + ": ");
+            out.print("\n"+this.arquivo +" : " + lexer.getLineNumberBeforeLastToken() + " : ");
+            out.println( strMessage );
             out.println( lexer.getLineBeforeLastToken() );
         }
         else 
         {
-            out.println("Error at line " + lexer.getLineNumber() + ": ");
+            out.print("\n"+this.arquivo + " :" + lexer.getLineNumber() + " : ");
+            out.println( strMessage );
             out.println(lexer.getCurrentLine());
         }
-        out.println( strMessage );
         out.flush();
         if ( out.checkError() )
             System.out.println("Error in signaling an error");
